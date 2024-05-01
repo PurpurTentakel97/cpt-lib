@@ -1,12 +1,12 @@
 {
   "name" : "cpt-lib",
-  "version" : "0.1",
+  "version-string" : "1.0.0",
+  "builtin-baseline" : "c591ac6466a55ef0a05a3d56bb1489ca36e50102",
   "dependencies" : [ {
     "name" : "spdlog",
-    "version>=" : "1.13.0#1"
+    "version>=" : "1.14.0"
   }, {
     "name" : "gtest",
     "version>=" : "1.14.0#1"
-  } ],
-  "builtin-baseline" : "4a600e9fea71bd7872080cbb716797e04d30e6d3"
+  } ]
 }
