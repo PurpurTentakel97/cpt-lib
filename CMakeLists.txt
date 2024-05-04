@@ -8,4 +8,4 @@ find_packages()
 
 include(project_options.cmake)
 
-add_subdirectory(src)
+add_subdirectory(src bin)
