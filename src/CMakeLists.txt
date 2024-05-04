@@ -1,4 +1,4 @@
-add_library(cpt_lib STATIC
+add_library(cpt_lib
             include/cpt/library.hpp
             library.cpp
 )
