@@ -1,7 +1,7 @@
 {
   "name" : "cpt-lib",
   "version-string" : "1.0.0",
-  "builtin-baseline" : "c591ac6466a55ef0a05a3d56bb1489ca36e50102",
+  "builtin-baseline" : "4a600e9fea71bd7872080cbb716797e04d30e6d3",
   "dependencies" : [ {
     "name" : "spdlog",
     "version>=" : "1.14.0"
