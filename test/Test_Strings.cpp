@@ -77,18 +77,20 @@ INSTANTIATE_TEST_SUITE_P(
          * 2 : ltrim output
          * 3 : rtrim output
          */
-        std::make_tuple("    test     ", "test", "test     ", "    test"),
-        std::make_tuple("      test", "test", "test", "      test"),
-        std::make_tuple("test     ", "test", "test     ","test"),
+        std::make_tuple("    test     ", "test", "test     ", "    test"), // whitespace front & back
+        std::make_tuple("      test", "test", "test", "      test"), // whitespace front
+        std::make_tuple("test     ", "test", "test     ","test"), // whitespace back
         std::make_tuple("    test    test    ", "test    test", "test    test    ", "    test    test"),
-        std::make_tuple("\ntest", "test", "test", "\ntest"),
-        std::make_tuple("test\n", "test", "test\n", "test"),
-        std::make_tuple("\ttest", "test", "test", "\ttest"),
-        std::make_tuple("test\t", "test", "test\t", "test")
-        ));
+        // whitespace front, mid & back
+        std::make_tuple("\ntest", "test", "test", "\ntest"), // newline front
+        std::make_tuple("test\n", "test", "test\n", "test"), // newline back
+        std::make_tuple("\ttest", "test", "test", "\ttest"), // tab front
+        std::make_tuple("test\t", "test", "test\t", "test") // tab back
+    ));
 
 
-class SplitStringFictures : public testing::TestWithParam<std::tuple<std::string, char, std::vector<std::string>>>
+class SplitStringFictures : public testing::TestWithParam<std::tuple<
+        std::string, char, cpt::SplitBehavior, std::vector<std::string>>>
 {
 };
 
@@ -96,8 +98,9 @@ TEST_P(SplitStringFictures, SPLIT)
 {
     auto const input = std::get<0>(GetParam());
     auto const delimiter = std::get<1>(GetParam());
-    auto const output = std::get<2>(GetParam());
-    auto const result = cpt::split(input, delimiter);
+    auto const empty_entries = std::get<2>(GetParam());
+    auto const output = std::get<3>(GetParam());
+    auto const result = cpt::split(input, delimiter, empty_entries);
 
     EXPECT_EQ(output.size(), result.size());
     for (std::size_t i = 0; i < output.size(); ++i)
@@ -106,9 +109,57 @@ TEST_P(SplitStringFictures, SPLIT)
     }
     EXPECT_EQ(std::get<0>(GetParam()), input);
 }
+
 INSTANTIATE_TEST_SUITE_P(
-STRINGS,
-SplitStringFictures,
-testing::Values(
-    std::make_tuple("test\ntest\ntest", '\n', std::vector<std::string>{"test", "test", "test"}))
-);
+    STRINGS,
+    SplitStringFictures,
+    testing::Values(
+        // simple delimiter test, skip
+        std::make_tuple(
+            "test\ntest\ntest",
+            '\n',
+            cpt::SplitBehavior::SkipEmptyParts,
+            std::vector<std::string>{"test", "test", "test"}),
+        // simple delimiter test, keep
+        std::make_tuple(
+            "test\ntest\ntest",
+            '\n',
+            cpt::SplitBehavior::KeepEmptyParts,
+            std::vector<std::string>{"test", "test", "test"}),
+        // delimiter front, skip
+        std::make_tuple(
+            "\ntest\ntest",
+            '\n',
+            cpt::SplitBehavior::SkipEmptyParts,
+            std::vector<std::string>{"test", "test"}),
+        // delimiter front, keep
+        std::make_tuple(
+            "\ntest\ntest",
+            '\n',
+            cpt::SplitBehavior::KeepEmptyParts,
+            std::vector<std::string>{"","test", "test"}),
+        // delimiter back, skip
+        std::make_tuple(
+            "test\ntest\n",
+            '\n',
+            cpt::SplitBehavior::SkipEmptyParts,
+            std::vector<std::string>{"test", "test"}),
+        // delimiter back, kepp
+        std::make_tuple(
+            "test\ntest\n",
+            '\n',
+            cpt::SplitBehavior::KeepEmptyParts,
+            std::vector<std::string>{"test", "test", ""}),
+        // double delimiter, skip
+        std::make_tuple(
+            "test\n\ntest\ntest",
+            '\n',
+            cpt::SplitBehavior::SkipEmptyParts,
+            std::vector<std::string>{"test", "test", "test"}),
+        // double delimiter, skip
+        std::make_tuple(
+            "test\n\ntest\ntest",
+            '\n',
+            cpt::SplitBehavior::KeepEmptyParts,
+            std::vector<std::string>{"test", "", "test", "test"})
+    ));

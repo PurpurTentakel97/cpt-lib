@@ -6,7 +6,8 @@
 
 #include "Strings.hpp"
 #include <algorithm>
-#include <gsl/narrow>
+#include <ranges>
+#include <iomanip>
 
 namespace cpt
 {
@@ -50,19 +51,23 @@ namespace cpt
                     input.end());
     }
 
-    std::vector<std::string_view> split(std::string_view const input, char const delimiter)
+    std::vector<std::string_view> split(std::string_view const input, char const delimiter,
+                                        SplitBehavior const split_behavior)
     {
         std::vector<std::string_view> output{};
-        auto current = std::string_view::iterator{input.begin()};
-
-        while (current != input.cend())
+        auto ranges = (std::views::split(input, delimiter)
+            | std::views::transform([](auto const entry) { return static_cast<std::string_view>(entry); })
+            | std::views::filter([split_behavior](std::string_view const entry)
+            {
+                if (not entry.empty()) { return true; }
+                if (split_behavior == SplitBehavior::KeepEmptyParts) { return true; }
+                return false;
+            }));
+        // | std::ranges::to<std::vector<std::string_view>>();
+        // todo: replace loop with std::ranges::to when GCC and Clang supports it.
+        for (auto const r : ranges)
         {
-            auto next = std::find_if(current, input.cend(),
-                                     [delimiter](auto const c) { return c == delimiter; });
-            output.emplace_back(input.substr(
-                gsl::narrow<std::basic_string_view<char>::size_type>(std::distance(input.cbegin(), current)),
-                gsl::narrow<std::basic_string_view<char>::size_type>(next - current)));
-            current = next == input.cend() ? next : next + 1;
+            output.push_back(r);
         }
 
         return output;

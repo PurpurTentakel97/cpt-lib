@@ -12,6 +12,12 @@
 
 namespace cpt
 {
+    enum class SplitBehavior
+    {
+        SkipEmptyParts,
+        KeepEmptyParts,
+    };
+
     [[nodiscard]] std::string trim_copy(std::string_view input);
     [[nodiscard]] std::string ltrim_copy(std::string_view input);
     [[nodiscard]] std::string rtrim_copy(std::string_view input);
@@ -21,5 +27,6 @@ namespace cpt
     void ltrim(std::string& input);
     void rtrim(std::string& input);
 
-    [[nodiscard]] std::vector<std::string_view> split(std::string_view input, char delimiter);
+    [[nodiscard]] std::vector<std::string_view> split(std::string_view input, char delimiter,
+                                                      SplitBehavior split_behavior = SplitBehavior::KeepEmptyParts);
 }
