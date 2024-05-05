@@ -6,7 +6,6 @@ target_link_libraries(my_test
                       PRIVATE
                       project_options
                       GTest::gtest_main
-                      spdlog::spdlog
                       cpt_lib
 )
 
