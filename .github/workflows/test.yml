@@ -40,20 +40,10 @@ jobs:
       VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
 
     steps:
-      - name: "Set environment variables"
-        shell: bash
-        run: |
-          echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
-      - name: "Update apt chache to install raylib dependencies"
-        run: sudo apt-get update -q
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-      - name: "Install raylib Linux dependencies"
-        run: sudo apt install -yq libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config libgl1-mesa-dev libx11-dev libxcursor-dev libxinerama-dev libxrandr-dev libfmt-dev
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-
       - uses: actions/checkout@v3
         with:
-          submodules: true
+          submodules: recursive
+          fetch-depth: 0
       - name: "Create directory '${{ env.VCPKG_DEFAULT_BINARY_CACHE }}'"
         run: mkdir -p $VCPKG_DEFAULT_BINARY_CACHE
         shell: bash
@@ -70,7 +60,7 @@ jobs:
           # The key includes: hash of the vcpkg.json file, the hash of the vcpkg Git commit id, and the used vcpkg's triplet. The vcpkg's commit id would suffice, but computing an hash out it does not harm.
           # Note: given a key, the cache content is immutable. If a cache entry has been created improperly, in order the recreate the right content the key must be changed as well, and it must be brand new (i.e. not existing already).
           key: |
-            ${{ hashFiles( 'vcpkg.json' ) }}-${{ hashFiles( '${{ env.VCPKG_ROOT }}/.git/HEAD' )}}-${{ matrix.triplet }}
+            ${{ hashFiles( 'vcpkg.json' ) }}-${{ hashFiles( 'vcpgk/versions/baseline.json')}}-${{ matrix.triplet }}
 
       - name: Show content of workspace after cache has been restored
         run: find $RUNNER_WORKSPACE
@@ -91,7 +81,7 @@ jobs:
       # Run CMake to generate Ninja project files, using the vcpkg's toolchain file to resolve and install the dependencies as specified in vcpkg.json.
       - name: Install dependencies and generate project files
         run: |
-          cmake -S . -B build -G "Ninja" -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }}
+          cmake -S . -B build -G "Ninja" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }}
         working-directory: "${{ github.workspace }}"
 
       # Build the whole project with Ninja (which is spawn by CMake).
