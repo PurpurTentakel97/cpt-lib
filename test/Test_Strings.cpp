@@ -90,7 +90,7 @@ INSTANTIATE_TEST_SUITE_P(
 
 
 class SplitStringFictures : public testing::TestWithParam<std::tuple<
-        std::string, char, cpt::SplitBehavior, std::vector<std::string>>>
+        std::string, std::string, cpt::SplitBehavior, std::vector<std::string>>>
 {
 };
 
@@ -117,49 +117,73 @@ INSTANTIATE_TEST_SUITE_P(
         // simple delimiter test, skip
         std::make_tuple(
             "test\ntest\ntest",
-            '\n',
+            "\n",
             cpt::SplitBehavior::SkipEmptyParts,
             std::vector<std::string>{"test", "test", "test"}),
         // simple delimiter test, keep
         std::make_tuple(
             "test\ntest\ntest",
-            '\n',
+            "\n",
             cpt::SplitBehavior::KeepEmptyParts,
             std::vector<std::string>{"test", "test", "test"}),
         // delimiter front, skip
         std::make_tuple(
             "\ntest\ntest",
-            '\n',
+            "\n",
             cpt::SplitBehavior::SkipEmptyParts,
             std::vector<std::string>{"test", "test"}),
         // delimiter front, keep
         std::make_tuple(
             "\ntest\ntest",
-            '\n',
+            "\n",
             cpt::SplitBehavior::KeepEmptyParts,
             std::vector<std::string>{"","test", "test"}),
         // delimiter back, skip
         std::make_tuple(
             "test\ntest\n",
-            '\n',
+            "\n",
             cpt::SplitBehavior::SkipEmptyParts,
             std::vector<std::string>{"test", "test"}),
         // delimiter back, kepp
         std::make_tuple(
             "test\ntest\n",
-            '\n',
+            "\n",
             cpt::SplitBehavior::KeepEmptyParts,
             std::vector<std::string>{"test", "test", ""}),
         // double delimiter, skip
         std::make_tuple(
             "test\n\ntest\ntest",
-            '\n',
+            "\n",
             cpt::SplitBehavior::SkipEmptyParts,
             std::vector<std::string>{"test", "test", "test"}),
         // double delimiter, skip
         std::make_tuple(
             "test\n\ntest\ntest",
-            '\n',
+            "\n",
             cpt::SplitBehavior::KeepEmptyParts,
-            std::vector<std::string>{"test", "", "test", "test"})
+            std::vector<std::string>{"test", "", "test", "test"}),
+        // multiple delimiter test, skip
+        std::make_tuple(
+            "test, test, test",
+            ", ",
+            cpt::SplitBehavior::SkipEmptyParts,
+            std::vector<std::string>{"test", "test", "test"}),
+        // multiple delimiter test, keep
+        std::make_tuple(
+            "test, test, test",
+            ", ",
+            cpt::SplitBehavior::KeepEmptyParts,
+            std::vector<std::string>{"test", "test", "test"}),
+        // multiple delimiter all, skip
+        std::make_tuple(
+            ", test, , test, test, ",
+            ", ",
+            cpt::SplitBehavior::SkipEmptyParts,
+            std::vector<std::string>{"test", "test", "test"}),
+        // multiple delimiter all, keep
+        std::make_tuple(
+            ", test, , test, test, ",
+            ", ",
+            cpt::SplitBehavior::KeepEmptyParts,
+            std::vector<std::string>{"","test", "", "test", "test", ""})
     ));

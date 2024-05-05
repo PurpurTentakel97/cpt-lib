@@ -51,7 +51,7 @@ namespace cpt
                     input.end());
     }
 
-    std::vector<std::string_view> split(std::string_view const input, char const delimiter,
+    std::vector<std::string_view> split(std::string_view const input, std::string_view const delimiter,
                                         SplitBehavior const split_behavior)
     {
         std::vector<std::string_view> output{};
