@@ -5,8 +5,8 @@ add_executable(my_test
 target_link_libraries(my_test
                       PRIVATE
                       project_options
-                      GTest::gtest_main
                       cpt_lib
+                      GTest::gtest_main
 )
 
 include(GoogleTest)

@@ -7,13 +7,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(${PROJECT_SOURCE_DIR}/project_options.cmake)
 
+include(${PROJECT_SOURCE_DIR}/lib_dependencies.cmake)
+find_lib_packages()
+
 add_subdirectory(src bin)
 
 if (${cpt_lib_tests})
     enable_testing()
 
-    include(${PROJECT_SOURCE_DIR}/dependencies.cmake)
-    find_packages()
+    include(${PROJECT_SOURCE_DIR}/test_dependencies.cmake)
+    find_test_packages()
 
     add_subdirectory(${PROJECT_SOURCE_DIR}/test)
 endif ()

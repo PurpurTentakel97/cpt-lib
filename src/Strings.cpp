@@ -6,6 +6,8 @@
 
 #include "Strings.hpp"
 #include <algorithm>
+#include <ranges>
+#include <iomanip>
 
 namespace cpt
 {
@@ -47,5 +49,27 @@ namespace cpt
         input.erase(std::find_if(input.rbegin(), input.rend(),
                                  [](auto const& c) { return !std::isspace(c); }).base(),
                     input.end());
+    }
+
+    std::vector<std::string_view> split(std::string_view const input, std::string_view const delimiter,
+                                        SplitBehavior const split_behavior)
+    {
+        std::vector<std::string_view> output{};
+        auto ranges = (std::views::split(input, delimiter)
+            | std::views::transform([](auto const entry) { return static_cast<std::string_view>(entry); })
+            | std::views::filter([split_behavior](std::string_view const entry)
+            {
+                if (not entry.empty()) { return true; }
+                if (split_behavior == SplitBehavior::KeepEmptyParts) { return true; }
+                return false;
+            }));
+        // | std::ranges::to<std::vector<std::string_view>>();
+        // todo: replace loop with std::ranges::to when GCC and Clang supports it.
+        for (auto const r : ranges)
+        {
+            output.push_back(r);
+        }
+
+        return output;
     }
 }
