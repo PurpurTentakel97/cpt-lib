@@ -7,6 +7,8 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <string_view>
 
 namespace cpt
 {
@@ -18,4 +20,6 @@ namespace cpt
     void trim(std::string& input);
     void ltrim(std::string& input);
     void rtrim(std::string& input);
+
+    [[nodiscard]] std::vector<std::string_view> split(std::string_view input, char delimiter);
 }

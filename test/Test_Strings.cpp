@@ -7,13 +7,15 @@
 #include <gtest/gtest.h>
 #include <cpt/Strings.hpp>
 #include <string>
+#include <string_view>
 #include <tuple>
+#include <vector>
 
-class StriptStringFictures : public testing::TestWithParam<std::tuple<std::string, std::string, std::string, std::string>>
+class TrimStringFictures : public testing::TestWithParam<std::tuple<std::string, std::string, std::string, std::string>>
 {
 };
 
-TEST_P(StriptStringFictures, TRIM)
+TEST_P(TrimStringFictures, TRIM)
 {
     auto input = std::get<0>(GetParam());
     auto const output = std::get<1>(GetParam());
@@ -21,7 +23,7 @@ TEST_P(StriptStringFictures, TRIM)
     EXPECT_EQ(input, output);
 }
 
-TEST_P(StriptStringFictures, LTRIM)
+TEST_P(TrimStringFictures, LTRIM)
 {
     auto input = std::get<0>(GetParam());
     auto const output = std::get<2>(GetParam());
@@ -29,7 +31,7 @@ TEST_P(StriptStringFictures, LTRIM)
     EXPECT_EQ(input, output);
 }
 
-TEST_P(StriptStringFictures, RTRIM)
+TEST_P(TrimStringFictures, RTRIM)
 {
     auto input = std::get<0>(GetParam());
     auto const output = std::get<3>(GetParam());
@@ -37,7 +39,7 @@ TEST_P(StriptStringFictures, RTRIM)
     EXPECT_EQ(input, output);
 }
 
-TEST_P(StriptStringFictures, TRIM_COPY)
+TEST_P(TrimStringFictures, TRIM_COPY)
 {
     auto const input = std::get<0>(GetParam());
     auto const output = std::get<1>(GetParam());
@@ -46,7 +48,7 @@ TEST_P(StriptStringFictures, TRIM_COPY)
     EXPECT_EQ(std::get<0>(GetParam()), input);
 }
 
-TEST_P(StriptStringFictures, LTRIM_COPY)
+TEST_P(TrimStringFictures, LTRIM_COPY)
 {
     auto const input = std::get<0>(GetParam());
     auto const output = std::get<2>(GetParam());
@@ -55,7 +57,7 @@ TEST_P(StriptStringFictures, LTRIM_COPY)
     EXPECT_EQ(std::get<0>(GetParam()), input);
 }
 
-TEST_P(StriptStringFictures, RTRIM_COPY)
+TEST_P(TrimStringFictures, RTRIM_COPY)
 {
     auto const input = std::get<0>(GetParam());
     auto const output = std::get<3>(GetParam());
@@ -66,7 +68,7 @@ TEST_P(StriptStringFictures, RTRIM_COPY)
 
 INSTANTIATE_TEST_SUITE_P(
     STRINGS,
-    StriptStringFictures,
+    TrimStringFictures,
     ::testing::Values(
         /*
          * the input in defined as followed
@@ -84,3 +86,29 @@ INSTANTIATE_TEST_SUITE_P(
         std::make_tuple("\ttest", "test", "test", "\ttest"),
         std::make_tuple("test\t", "test", "test\t", "test")
         ));
+
+
+class SplitStringFictures : public testing::TestWithParam<std::tuple<std::string, char, std::vector<std::string>>>
+{
+};
+
+TEST_P(SplitStringFictures, SPLIT)
+{
+    auto const input = std::get<0>(GetParam());
+    auto const delimiter = std::get<1>(GetParam());
+    auto const output = std::get<2>(GetParam());
+    auto const result = cpt::split(input, delimiter);
+
+    EXPECT_EQ(output.size(), result.size());
+    for (std::size_t i = 0; i < output.size(); ++i)
+    {
+        EXPECT_EQ(result[i], output[i]);
+    }
+    EXPECT_EQ(std::get<0>(GetParam()), input);
+}
+INSTANTIATE_TEST_SUITE_P(
+STRINGS,
+SplitStringFictures,
+testing::Values(
+    std::make_tuple("test\ntest\ntest", '\n', std::vector<std::string>{"test", "test", "test"}))
+);

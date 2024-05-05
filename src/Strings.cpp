@@ -6,6 +6,7 @@
 
 #include "Strings.hpp"
 #include <algorithm>
+#include <gsl/narrow>
 
 namespace cpt
 {
@@ -47,5 +48,23 @@ namespace cpt
         input.erase(std::find_if(input.rbegin(), input.rend(),
                                  [](auto const& c) { return !std::isspace(c); }).base(),
                     input.end());
+    }
+
+    std::vector<std::string_view> split(std::string_view const input, char const delimiter)
+    {
+        std::vector<std::string_view> output{};
+        auto current = std::string_view::iterator{input.begin()};
+
+        while (current != input.cend())
+        {
+            auto next = std::find_if(current, input.cend(),
+                                     [delimiter](auto const c) { return c == delimiter; });
+            output.emplace_back(input.substr(
+                gsl::narrow<std::basic_string_view<char>::size_type>(std::distance(input.cbegin(), current)),
+                gsl::narrow<std::basic_string_view<char>::size_type>(next - current)));
+            current = next == input.cend() ? next : next + 1;
+        }
+
+        return output;
     }
 }

@@ -14,4 +14,5 @@ target_include_directories(cpt_lib
 target_link_libraries(cpt_lib
                       PRIVATE
                       project_options
+                      Microsoft.GSL::GSL
 )
