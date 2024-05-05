@@ -70,7 +70,7 @@ jobs:
           # The key includes: hash of the vcpkg.json file, the hash of the vcpkg Git commit id, and the used vcpkg's triplet. The vcpkg's commit id would suffice, but computing an hash out it does not harm.
           # Note: given a key, the cache content is immutable. If a cache entry has been created improperly, in order the recreate the right content the key must be changed as well, and it must be brand new (i.e. not existing already).
           key: |
-            ${{ hashFiles( 'vcpkg.json' ) }}-${{ hashFiles( '${{ env.VCPKG_ROOT }}/.git/HEAD' )}}-${{ matrix.triplet }}
+            ${{ hashFiles( 'vcpkg.json' ) }}-${{ hashFiles( 'vcpgk/versions/baseline.json')}}-${{ matrix.triplet }}
 
       - name: Show content of workspace after cache has been restored
         run: find $RUNNER_WORKSPACE
@@ -91,7 +91,7 @@ jobs:
       # Run CMake to generate Ninja project files, using the vcpkg's toolchain file to resolve and install the dependencies as specified in vcpkg.json.
       - name: Install dependencies and generate project files
         run: |
-          cmake -S . -B build -G "Ninja" -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }}
+          cmake -S . -B build -G "Ninja" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }}
         working-directory: "${{ github.workspace }}"
 
       # Build the whole project with Ninja (which is spawn by CMake).
