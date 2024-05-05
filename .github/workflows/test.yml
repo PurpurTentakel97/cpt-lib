@@ -95,4 +95,4 @@ jobs:
         shell: bash
         
       - name: Test Suite
-        run: ctest --build-run-dir build
+        run: ctest --test-dir build
