@@ -1,6 +1,9 @@
 add_library(cpt_lib
-            include/cpt/library.hpp
-            library.cpp
+            include/cpt/Lib.hpp
+            include/cpt/Files.hpp
+            include/cpt/Strings.hpp
+            Files.cpp
+            Strings.cpp
 )
 
 target_include_directories(cpt_lib
