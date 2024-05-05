@@ -41,13 +41,16 @@ namespace cpt
     void ltrim(std::string& input)
     {
         input.erase(input.begin(), std::ranges::find_if(input,
-                                                        [](auto const c) { return !std::isspace(c); }));
+                                                        [](auto const c)
+                                                        {
+                                                            return !std::isspace(static_cast<unsigned int>(c));
+                                                        }));
     }
 
     void rtrim(std::string& input)
     {
         input.erase(std::find_if(input.rbegin(), input.rend(),
-                                 [](auto const& c) { return !std::isspace(c); }).base(),
+                                 [](auto const c) { return !std::isspace(static_cast<unsigned int>(c)); }).base(),
                     input.end());
     }
 
@@ -59,9 +62,9 @@ namespace cpt
             | std::views::transform([](auto const entry) { return static_cast<std::string_view>(entry); })
             | std::views::filter([split_behavior](std::string_view const entry)
             {
-                if (not entry.empty()) { return true; }
-                if (split_behavior == SplitBehavior::KeepEmptyParts) { return true; }
-                return false;
+                return
+                    not entry.empty()
+                    or split_behavior == SplitBehavior::KeepEmptyParts;
             }));
         // | std::ranges::to<std::vector<std::string_view>>();
         // todo: replace loop with std::ranges::to when GCC and Clang supports it.
