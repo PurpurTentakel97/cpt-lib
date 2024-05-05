@@ -93,3 +93,6 @@ jobs:
       - name: Show content of workspace at its completion
         run: find $RUNNER_WORKSPACE
         shell: bash
+        
+      - name: Test Suite
+        run: ctest --build-run-dir build
