@@ -40,17 +40,6 @@ jobs:
       VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
 
     steps:
-      - name: "Set environment variables"
-        shell: bash
-        run: |
-          echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
-      - name: "Update apt chache to install raylib dependencies"
-        run: sudo apt-get update -q
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-      - name: "Install raylib Linux dependencies"
-        run: sudo apt install -yq libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config libgl1-mesa-dev libx11-dev libxcursor-dev libxinerama-dev libxrandr-dev libfmt-dev
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-
       - uses: actions/checkout@v3
         with:
           submodules: true
