@@ -1,8 +1,9 @@
-add_executable(my_test
+add_executable(lib_test
                Test_Strings.cpp
+               Test_Types.cpp
 )
 
-target_link_libraries(my_test
+target_link_libraries(lib_test
                       PRIVATE
                       project_options
                       cpt_lib
@@ -10,4 +11,4 @@ target_link_libraries(my_test
 )
 
 include(GoogleTest)
-gtest_discover_tests(my_test)
+gtest_discover_tests(lib_test)

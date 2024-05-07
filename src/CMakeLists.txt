@@ -2,6 +2,7 @@ add_library(cpt_lib
             include/cpt/Lib.hpp
             include/cpt/Files.hpp
             include/cpt/Strings.hpp
+            include/cpt/Types.hpp
             Files.cpp
             Strings.cpp
 )
