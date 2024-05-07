@@ -7,13 +7,11 @@
 #pragma once
 
 #include <string>
-#include <vector>
 #include <string_view>
+#include <vector>
 
-namespace cpt
-{
-    enum class SplitBehavior
-    {
+namespace cpt {
+    enum class SplitBehavior {
         SkipEmptyParts,
         KeepEmptyParts,
     };
@@ -26,6 +24,7 @@ namespace cpt
     void ltrim(std::string& input);
     void rtrim(std::string& input);
 
-    [[nodiscard]] std::vector<std::string_view> split(std::string_view input, std::string_view delimiter,
+    [[nodiscard]] std::vector<std::string_view> split(std::string_view input,
+                                                      std::string_view delimiter,
                                                       SplitBehavior split_behavior = SplitBehavior::KeepEmptyParts);
-}
+} // namespace cpt
