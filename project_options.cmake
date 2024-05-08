@@ -37,8 +37,7 @@ set_warnings(warnings ${warnings_as_errors})
 add_library(sanitizers INTERFACE)
 enable_sanitizers(sanitizers ${enable_address_sanitizer} ${enable_undefined_behavior_sanitizer})
 
-add_library(project_options INTERFACE
-            test/Test_Strings.cpp)
+add_library(project_options INTERFACE)
 target_link_libraries(project_options
                       INTERFACE warnings
                       INTERFACE sanitizers
