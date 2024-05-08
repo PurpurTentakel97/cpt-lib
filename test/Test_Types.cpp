@@ -8,7 +8,7 @@
 #include <cstddef>
 #include <gtest/gtest.h>
 
-TEST(TYPES, USIZE) {
+TEST(Types, usize) {
     auto constexpr same = std::is_same_v<std::size_t, cpt::usize>;
     static_assert(same);
     ASSERT_TRUE(same);

@@ -6,10 +6,7 @@
 
 #include <cpt/Strings.hpp>
 #include <gtest/gtest.h>
-#include <string>
-#include <string_view>
 #include <tuple>
-#include <vector>
 
 class TrimStringFictures
     : public testing::TestWithParam<std::tuple<std::string, std::string, std::string, std::string>> { };
