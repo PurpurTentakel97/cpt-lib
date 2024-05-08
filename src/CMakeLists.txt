@@ -3,6 +3,7 @@ add_library(cpt_lib
             include/cpt/Files.hpp
             include/cpt/Strings.hpp
             include/cpt/Types.hpp
+            include/cpt/Concepts.hpp
             Files.cpp
             Strings.cpp
 )

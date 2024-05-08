@@ -2,6 +2,7 @@ add_executable(lib_test
                Test_Strings.cpp
                Test_Types.cpp
                Test_Files.cpp
+               Test_Concepts.cpp
 )
 
 target_link_libraries(lib_test
