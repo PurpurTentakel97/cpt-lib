@@ -17,5 +17,5 @@ target_link_libraries(cpt_lib
                       PUBLIC
                       tl::expected
                       PRIVATE
-                      project_options
+                      cpt_lib_project_options
 )
