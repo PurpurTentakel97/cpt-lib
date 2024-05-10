@@ -90,6 +90,12 @@ jobs:
           cmake --build build --config ${{matrix.build}}
         working-directory: "${{ github.workspace }}"
 
+      # install the whole project
+      - name: Install ${{matrix.os}} / ${{matrix.build}}
+        run: |
+          cmake --install build --prefix install
+        working-directory: "${{ github.workspace }}"
+
       - name: Show content of workspace at its completion
         run: find $RUNNER_WORKSPACE
         shell: bash
