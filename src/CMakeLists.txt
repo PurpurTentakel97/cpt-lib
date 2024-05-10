@@ -21,7 +21,7 @@ target_link_libraries(cpt_lib
 )
 
 install(TARGETS cpt_lib
-        EXPORT cpt_lib-targets
+        EXPORT cpt-lib-targets
 )
 install(DIRECTORY include
         DESTINATION ${CMAKE_INSTALL_PREFIX}
