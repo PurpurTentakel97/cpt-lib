@@ -10,5 +10,5 @@
 
 namespace cpt {
     template<typename T, typename... Args>
-    concept IsOneOf = (std::same_as<T,Args> or ...);
+    concept IsOneOf = (std::same_as<T, Args> or ...);
 }
