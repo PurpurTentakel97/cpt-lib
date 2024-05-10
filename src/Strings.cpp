@@ -4,7 +4,7 @@
 // 05.05.24
 //
 
-#include "Strings.hpp"
+#include <cpt/Strings.hpp>
 #include <algorithm>
 #include <iomanip>
 #include <ranges>

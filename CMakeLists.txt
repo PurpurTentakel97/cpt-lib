@@ -21,3 +21,9 @@ if (${cpt_lib_tests})
 
     add_subdirectory(${PROJECT_SOURCE_DIR}/test)
 endif ()
+
+install(EXPORT cpt-lib-targets
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake
+)
+
+install(FILES cmake/cpt-lib-config.cmake DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake)
