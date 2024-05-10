@@ -81,7 +81,7 @@ jobs:
       # Run CMake to generate Ninja project files, using the vcpkg's toolchain file to resolve and install the dependencies as specified in vcpkg.json.
       - name: Install dependencies and generate project files
         run: |
-          cmake -S . -B build -G "Ninja" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }}
+          cmake -S . -B build -G "Ninja" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} -DCMAKE_INSTALL_PFREFIX=INSTALL
         working-directory: "${{ github.workspace }}"
 
       # Build the whole project with Ninja (which is spawn by CMake).
@@ -93,7 +93,7 @@ jobs:
       # install the whole project
       - name: Install ${{matrix.os}} / ${{matrix.build}}
         run: |
-          cmake --install build --prefix install
+          cmake --install build
         working-directory: "${{ github.workspace }}"
 
       - name: Show content of workspace at its completion
