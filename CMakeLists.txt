@@ -9,6 +9,7 @@ FetchContent_MakeAvailable(vcpkg)
 
 set(CMAKE_TOOLCHAIN_FILE "${vcpkg_SOURCE_DIR}/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "")
 project(cpt_lib)
+include(GNUInstallDirs)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -30,8 +31,13 @@ if (${cpt_lib_tests})
     add_subdirectory(${PROJECT_SOURCE_DIR}/test)
 endif ()
 
-install(EXPORT cpt-lib-targets
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake
+install(TARGETS cpt_lib EXPORT cpt-lib-targets ARCHIVE
+        FILE_SET HEADERS
 )
-
-install(FILES cmake/cpt-lib-config.cmake DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake)
+install(EXPORT cpt-lib-targets
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake
+        NAMESPACE cpt::
+)
+install(FILES "cmake/cpt-lib-config.cmake"
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake
+)

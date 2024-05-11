@@ -1,11 +1,17 @@
-add_library(cpt_lib
-            include/cpt/Lib.hpp
-            include/cpt/Files.hpp
-            include/cpt/Strings.hpp
-            include/cpt/Types.hpp
-            include/cpt/Concepts.hpp
-            Files.cpp
-            Strings.cpp
+add_library(cpt_lib)
+
+target_sources(cpt_lib
+               PRIVATE
+               Files.cpp
+               Strings.cpp
+
+               PUBLIC FILE_SET HEADERS
+               BASE_DIRS include FILES
+               include/cpt/Lib.hpp
+               include/cpt/Files.hpp
+               include/cpt/Strings.hpp
+               include/cpt/Types.hpp
+               include/cpt/Concepts.hpp
 )
 
 target_include_directories(cpt_lib
@@ -19,12 +25,3 @@ target_link_libraries(cpt_lib
                       PRIVATE
                       $<BUILD_INTERFACE:cpt_lib_project_options>
 )
-
-install(TARGETS cpt_lib
-        EXPORT cpt-lib-targets
-)
-install(DIRECTORY include
-        DESTINATION ${CMAKE_INSTALL_PREFIX}
-        FILES_MATCHING PATTERN "*.hpp"
-)
-
