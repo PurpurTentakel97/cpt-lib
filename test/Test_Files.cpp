@@ -15,8 +15,8 @@ TEST(Files, ReadMissingDir) {
     auto constexpr error = cpt::ReadFileError::OpenFile;
 
     auto const result = cpt::read_file(path);
-    ASSERT_FALSE(result.has_value());
-    ASSERT_EQ(result.error(), error);
+    ASSERT_FALSE(result.ok());
+    ASSERT_EQ(result.unwrap_err(), error);
 }
 
 TEST(Files, ReadMissingFile) {
@@ -24,8 +24,8 @@ TEST(Files, ReadMissingFile) {
     auto constexpr error = cpt::ReadFileError::OpenFile;
 
     auto const result = cpt::read_file(path);
-    ASSERT_FALSE(result.has_value());
-    ASSERT_EQ(result.error(), error);
+    ASSERT_FALSE(result.ok());
+    ASSERT_EQ(result.unwrap_err(), error);
 }
 
 TEST(Files, DoubleRead) {
@@ -39,8 +39,8 @@ TEST(Files, DoubleRead) {
     ASSERT_TRUE(file);
 
     auto const result = cpt::read_file(path);
-    ASSERT_FALSE(result.has_value());
-    ASSERT_EQ(result.error(), error);
+    ASSERT_FALSE(result.ok());
+    ASSERT_EQ(result.unwrap_err(), error);
 
     file.close();
     ASSERT_TRUE(std::filesystem::remove(path));
@@ -58,8 +58,8 @@ TEST(Files, ReadFileSuccess) {
     ASSERT_FALSE(file.is_open());
 
     auto const result = cpt::read_file(path);
-    ASSERT_TRUE(result.has_value());
-    ASSERT_EQ(result.value(), text);
+    ASSERT_TRUE(result.ok());
+    ASSERT_EQ(result.unwrap(), text);
 
     ASSERT_TRUE(std::filesystem::remove(path));
 }
@@ -70,15 +70,15 @@ TEST(Files, WriteMissingDir) {
     auto constexpr error   = cpt::WriteFileError::OpenFile;
 
     auto const result = cpt::write_file(path, contens);
-    ASSERT_FALSE(result.has_value());
-    ASSERT_EQ(result.error(), error);
+    ASSERT_FALSE(result.ok());
+    ASSERT_EQ(result.unwrap_err(), error);
 }
 
 TEST(Files, WriteSuccess) {
     auto const path = std::filesystem::path("new_file.txt");
 
     auto const result = cpt::write_file(path, "text");
-    ASSERT_TRUE(result.has_value());
+    ASSERT_TRUE(result.ok());
 
     ASSERT_TRUE(std::filesystem::remove(path));
 }
@@ -88,11 +88,11 @@ TEST(Files, ReadWriteSuccsess) {
     auto constexpr text = "best text evor\nreally";
 
     auto const result_write = cpt::write_file(path, text);
-    ASSERT_TRUE(result_write.has_value());
+    ASSERT_TRUE(result_write.ok());
 
     auto const result_read = cpt::read_file(path);
-    ASSERT_TRUE(result_read.has_value());
-    ASSERT_EQ(result_read.value(), text);
+    ASSERT_TRUE(result_read.ok());
+    ASSERT_EQ(result_read.unwrap(), text);
 
     ASSERT_TRUE(std::filesystem::remove(path));
 }

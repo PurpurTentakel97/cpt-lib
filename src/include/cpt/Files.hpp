@@ -5,10 +5,10 @@
 //
 
 #pragma once
+#include <cpt/Result.hpp>
 #include <filesystem>
 #include <string>
 #include <string_view>
-#include <tl/expected.hpp>
 
 namespace cpt {
     enum class ReadFileError {
@@ -21,8 +21,7 @@ namespace cpt {
         WriteToFile,
     };
 
-    [[nodiscard]] tl::expected<std::string, ReadFileError> read_file(std::filesystem::path const& path);
+    [[nodiscard]] Result<std::string, ReadFileError> read_file(std::filesystem::path const& path);
 
-    [[nodiscard]] tl::expected<void, WriteFileError> write_file(std::filesystem::path const& path,
-                                                                std::string_view contents);
+    [[nodiscard]] Result<std::monostate, WriteFileError> write_file(std::filesystem::path const& path, std::string_view contents);
 } // namespace cpt

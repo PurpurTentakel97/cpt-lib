@@ -21,8 +21,6 @@ target_include_directories(cpt_lib
 )
 
 target_link_libraries(cpt_lib
-                      PUBLIC
-                      tl::expected
                       PRIVATE
                       $<BUILD_INTERFACE:cpt_lib_project_options>
 )
