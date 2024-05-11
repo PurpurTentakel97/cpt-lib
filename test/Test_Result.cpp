@@ -32,7 +32,7 @@ bool operator==(Value const& lhs, Value const& rhs) {
 }
 
 
-TEST(Result, Construct_OK) {
+TEST(Result, OK) {
     auto const result = cpt::Result<Value, Error>(Value(1));
 
     auto const test_exception = [result]() {
@@ -53,7 +53,7 @@ TEST(Result, Construct_OK) {
     ASSERT_EQ(result.unwrap_or_default(), Value(1));
 }
 
-TEST(Result, Construct_Error) {
+TEST(Result, Error) {
     auto const result = cpt::Result<Value, Error>(cpt::Err(Error::default_error));
 
     auto const test_exception = [result]() {
@@ -74,7 +74,7 @@ TEST(Result, Construct_Error) {
     ASSERT_EQ(result.unwrap_or_default(), Value(0));
 }
 
-TEST(Result, Construct_OK_Same_type) {
+TEST(Result, OK_Same_Type) {
     auto const result         = cpt::Result<Value, Value>(Value(1));
     auto const test_exception = [result]() {
         try {
@@ -94,7 +94,7 @@ TEST(Result, Construct_OK_Same_type) {
     ASSERT_EQ(result.unwrap_or_default(), Value(1));
 }
 
-TEST(Result, Construct_Error_Same_type) {
+TEST(Result, Error_Same_Type) {
     auto const result = cpt::Result<Error, Error>(cpt::Err(Error::default_error));
 
     auto const test_exception = [result]() {
