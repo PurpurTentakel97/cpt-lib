@@ -1,4 +1,4 @@
-add_library(cpt_lib)
+add_library(cpt_lib STATIC)
 
 target_sources(cpt_lib
                PRIVATE
