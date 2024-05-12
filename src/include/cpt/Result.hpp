@@ -78,7 +78,9 @@ namespace cpt {
 
         template<typename F>
             requires std::invocable<F>
-        [[nodiscard]] constexpr T unwarp_or_else(F const& func) const {
+        [[nodiscard]] constexpr T unwarp_or_else(F const& func) const
+            requires(std::copyable<T> or std::movable<T>)
+        {
             return ok() ? unwrap() : func();
         }
 
