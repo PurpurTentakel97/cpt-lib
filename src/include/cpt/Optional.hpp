@@ -5,9 +5,9 @@
 //
 
 #pragma once
+#include <concepts>
 #include <stdexcept>
 #include <variant>
-#include <concepts>
 
 namespace cpt {
     template<typename T>
@@ -37,12 +37,19 @@ namespace cpt {
             throw std::logic_error("while unwrapping an optional");
         }
 
-        template<typename  F> requires std::invocable<F>
+        [[nodiscard]] constexpr T unwrap_or(T const& other) const {
+            return ok() ? unwrap() : other;
+        }
+
+        template<typename F>
+            requires std::invocable<F>
         [[nodiscard]] constexpr T unwrap_or_else(F const& func) const {
             return ok() ? unwrap() : func();
         }
 
-        [[nodiscard]] constexpr T unwrap_or_default() const requires(std::default_initializable<T>) {
+        [[nodiscard]] constexpr T unwrap_or_default() const
+            requires(std::default_initializable<T>)
+        {
             return ok() ? unwrap() : T();
         }
     };

@@ -18,6 +18,7 @@ TEST(Optional, OK) {
 
     ASSERT_TRUE(optional.ok());
     ASSERT_EQ(optional.unwrap(), Entry::default_entry);
+    ASSERT_EQ(optional.unwrap_or(Entry::other_entry), Entry::default_entry);
     ASSERT_EQ(optional.unwrap_or_else([]() { return Entry::other_entry; }), Entry::default_entry);
     ASSERT_EQ(optional.unwrap_or_default(), Entry::default_entry);
 }
@@ -36,6 +37,7 @@ TEST(Optional, Empty) {
 
     ASSERT_FALSE(optional.ok());
     ASSERT_THROW(exception_check(), std::logic_error);
+    ASSERT_EQ(optional.unwrap_or(Entry::other_entry), Entry::other_entry);
     ASSERT_EQ(optional.unwrap_or_else([]() { return Entry::other_entry; }), Entry::other_entry);
     ASSERT_EQ(optional.unwrap_or_default(), Entry::default_entry);
 }
