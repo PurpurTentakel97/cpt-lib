@@ -37,13 +37,18 @@ namespace cpt {
             throw std::logic_error("while unwrapping an optional");
         }
 
-        [[nodiscard]] constexpr T unwrap_or(T const& other) const {
+        [[nodiscard]] constexpr T const& unwrap_or(T const& other) const {
+            return ok() ? unwrap() : other;
+        }
+
+        [[nodiscard]] constexpr T& unwrap_or(T const& other) {
             return ok() ? unwrap() : other;
         }
 
         template<typename F>
             requires std::invocable<F>
-        [[nodiscard]] constexpr T unwrap_or_else(F const& func) const {
+        [[nodiscard]] constexpr T unwrap_or_else(F const& func) const
+        {
             return ok() ? unwrap() : func();
         }
 

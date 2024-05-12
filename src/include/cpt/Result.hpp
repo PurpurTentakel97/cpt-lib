@@ -54,7 +54,7 @@ namespace cpt {
             throw std::logic_error("while unwrapping a result with 'unwarp'");
         }
 
-        [[nodiscard]] constexpr  E const& unwrap_err() const {
+        [[nodiscard]] constexpr E const& unwrap_err() const {
             if (err()) {
                 return std::get<1>(m_value);
             }
@@ -68,7 +68,11 @@ namespace cpt {
             throw std::logic_error("while unwrapping an result with 'unwrap_err'");
         }
 
-        [[nodiscard]] constexpr T unwrap_or(T const& other) const {
+        [[nodiscard]] constexpr T const& unwrap_or(T const& other) const {
+            return ok() ? unwrap() : other;
+        }
+
+        [[nodiscard]] constexpr T& unwrap_or(T const& other) {
             return ok() ? unwrap() : other;
         }
 
