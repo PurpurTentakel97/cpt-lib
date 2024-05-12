@@ -93,7 +93,7 @@ jobs:
       # install the whole project
       - name: Install ${{matrix.os}} / ${{matrix.build}}
         run: |
-          cmake --install build
+          cmake --install build --config ${{matrix.build}}
         working-directory: "${{ github.workspace }}"
 
       - name: Show content of workspace at its completion
