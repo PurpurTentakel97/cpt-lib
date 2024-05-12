@@ -31,84 +31,49 @@ public:
 
 
 TEST(Result, OK) {
-    auto const result = cpt::Result<Value, Error>(Value(1));
-
-    auto const test_exception = [result]() {
-        try {
-            [[maybe_unused]] auto const r = result.unwrap_err();
-        } catch (std::logic_error const& e) {
-            EXPECT_STREQ(e.what(), "while unwrapping an result with 'unwrap_err'");
-            throw;
-        }
-    };
+    cpt::Result<Value, Error> const result = Value(1);
 
     ASSERT_TRUE(result.ok());
     ASSERT_FALSE(result.err());
     ASSERT_EQ(result.unwrap(), Value(1));
-    ASSERT_THROW(test_exception(), std::logic_error);
+    ASSERT_THROW([result]() { [[maybe_unused]] auto const r = result.unwrap_err(); }(), cpt::BadResultAccessError);
     ASSERT_EQ(result.unwrap_or(Value(2)), Value(1));
     ASSERT_EQ(result.unwarp_or_else([]() { return Value(2); }), Value(1));
     ASSERT_EQ(result.unwrap_or_default(), Value(1));
 }
 
 TEST(Result, Error) {
-    auto const result = cpt::Result<Value, Error>(cpt::Err(Error::default_error));
-
-    auto const test_exception = [result]() {
-        try {
-            [[maybe_unused]] auto const r = result.unwrap();
-        } catch (std::logic_error const& e) {
-            EXPECT_STREQ(e.what(), "while unwrapping a result with 'unwarp'");
-            throw;
-        }
-    };
+    cpt::Result<Value, Error> constexpr result = cpt::Err{ Error::default_error };
 
     ASSERT_TRUE(result.err());
     ASSERT_FALSE(result.ok());
     ASSERT_EQ(result.unwrap_err(), Error::default_error);
-    ASSERT_THROW(test_exception(), std::logic_error);
+    ASSERT_THROW([result]() { [[maybe_unused]] auto const r = result.unwrap(); }(), cpt::BadResultAccessResult);
     ASSERT_EQ(result.unwrap_or(Value(2)), Value(2));
     ASSERT_EQ(result.unwarp_or_else([]() { return Value(2); }), Value(2));
     ASSERT_EQ(result.unwrap_or_default(), Value(0));
 }
 
 TEST(Result, OK_Same_Type) {
-    auto const result         = cpt::Result<Value, Value>(Value(1));
-    auto const test_exception = [result]() {
-        try {
-            [[maybe_unused]] auto const r = result.unwrap_err();
-        } catch (std::logic_error const& e) {
-            EXPECT_STREQ(e.what(), "while unwrapping an result with 'unwrap_err'");
-            throw;
-        }
-    };
+    cpt::Result<Value, Value> const result = Value(1);
 
     ASSERT_TRUE(result.ok());
     ASSERT_FALSE(result.err());
     ASSERT_EQ(result.unwrap(), Value(1));
-    ASSERT_THROW(test_exception(), std::logic_error);
+    ASSERT_THROW([result]() { [[maybe_unused]] auto const r = result.unwrap_err(); }(), cpt::BadResultAccessError);
     ASSERT_EQ(result.unwrap_or(Value(2)), Value(1));
     ASSERT_EQ(result.unwarp_or_else([]() { return Value(2); }), Value(1));
     ASSERT_EQ(result.unwrap_or_default(), Value(1));
 }
 
 TEST(Result, Error_Same_Type) {
-    auto const result = cpt::Result<Error, Error>(cpt::Err(Error::default_error));
-
-    auto const test_exception = [result]() {
-        try {
-            [[maybe_unused]] auto const r = result.unwrap();
-        } catch (std::logic_error const& e) {
-            EXPECT_STREQ(e.what(), "while unwrapping a result with 'unwarp'");
-            throw;
-        }
-    };
+    cpt::Result<Error, Error> constexpr result = cpt::Err{ Error::default_error };
 
     ASSERT_TRUE(result.err());
     ASSERT_FALSE(result.ok());
     ASSERT_EQ(result.unwrap_err(), Error::default_error);
-    ASSERT_THROW(test_exception(), std::logic_error);
+    ASSERT_THROW([result]() { [[maybe_unused]] auto const r = result.unwrap(); }(), cpt::BadResultAccessResult);
     ASSERT_EQ(result.unwrap_or(Error::other_error), Error::other_error);
-    ASSERT_EQ(result.unwarp_or_else([](){return Error::other_error;}), Error::other_error);
+    ASSERT_EQ(result.unwarp_or_else([]() { return Error::other_error; }), Error::other_error);
     ASSERT_EQ(result.unwrap_or_default(), Error::default_error);
 }

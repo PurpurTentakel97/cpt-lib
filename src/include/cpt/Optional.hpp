@@ -10,6 +10,11 @@
 #include <variant>
 
 namespace cpt {
+    class BadOptionalAccess final : public std::logic_error {
+    public:
+        BadOptionalAccess() : std::logic_error{ "trying to access value of empty optional" } { }
+    };
+
     template<typename T>
     class Optional final {
     private:
@@ -27,14 +32,14 @@ namespace cpt {
             if (ok()) {
                 return std::get<0>(m_value);
             }
-            throw std::logic_error("while unwrapping an optional");
+            throw BadOptionalAccess();
         }
 
         [[nodiscard]] constexpr T const& unwrap() const {
             if (ok()) {
                 return std::get<0>(m_value);
             }
-            throw std::logic_error("while unwrapping an optional");
+            throw BadOptionalAccess();
         }
 
         [[nodiscard]] constexpr T const& unwrap_or(T const& other) const {

@@ -10,6 +10,22 @@
 #include <variant>
 
 namespace cpt {
+    class BadResultAccess : public std::logic_error {
+    public:
+        explicit BadResultAccess(char const* message) : std::logic_error{ message } { }
+    };
+
+    class BadResultAccessResult final : public BadResultAccess {
+    public:
+        BadResultAccessResult() : BadResultAccess{ "trying to access result of bad result" } { }
+    };
+
+    class BadResultAccessError final : public BadResultAccess {
+    public:
+        BadResultAccessError() : BadResultAccess{ "trying to access error of good result" } { }
+    };
+
+
     template<typename E>
     struct Err final {
     private:
@@ -44,28 +60,28 @@ namespace cpt {
             if (ok()) {
                 return std::get<0>(m_value);
             }
-            throw std::logic_error("while unwrapping a result with 'unwarp'");
+            throw BadResultAccessResult();
         }
 
         [[nodiscard]] constexpr T& unwrap() {
             if (ok()) {
                 return std::get<0>(m_value);
             }
-            throw std::logic_error("while unwrapping a result with 'unwarp'");
+            throw BadResultAccessResult();
         }
 
         [[nodiscard]] constexpr E const& unwrap_err() const {
             if (err()) {
                 return std::get<1>(m_value);
             }
-            throw std::logic_error("while unwrapping an result with 'unwrap_err'");
+            throw BadResultAccessError();
         }
 
         [[nodiscard]] constexpr E& unwrap_err() {
             if (err()) {
                 return std::get<1>(m_value);
             }
-            throw std::logic_error("while unwrapping an result with 'unwrap_err'");
+            throw BadResultAccessError();
         }
 
         [[nodiscard]] constexpr T const& unwrap_or(T const& other) const {
