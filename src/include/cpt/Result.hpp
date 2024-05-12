@@ -62,7 +62,7 @@ namespace cpt {
             return ok() ? unwrap() : func();
         }
 
-        [[nodiscard]] T unwrap_or_default() const {
+        [[nodiscard]] T unwrap_or_default() const requires(std::default_initializable<T>) {
             return ok() ? unwrap() : T();
         }
     };

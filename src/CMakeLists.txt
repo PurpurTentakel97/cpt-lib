@@ -10,6 +10,7 @@ target_sources(cpt_lib
                include/cpt/Concepts.hpp
                include/cpt/Files.hpp
                include/cpt/Lib.hpp
+               include/cpt/Optional.hpp
                include/cpt/Result.hpp
                include/cpt/Strings.hpp
                include/cpt/Types.hpp
