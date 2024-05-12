@@ -17,7 +17,7 @@ namespace cpt {
 
     public:
         Optional(T&& value) : m_value{ std::in_place_index<0>, std::forward<T>(value) } { }
-        Optional() : m_value{ std::in_place_index<1>, std::forward<std::monostate>(std::monostate()) } { }
+        Optional() : m_value{ std::in_place_index<1>, std::monostate() } { }
 
         [[nodiscard]] bool ok() const {
             return m_value.index() == 0;
