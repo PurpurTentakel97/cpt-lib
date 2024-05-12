@@ -24,12 +24,10 @@ public:
         return m_value;
     }
 
-    friend bool operator==(Value const& lhs, Value const& rhs);
+    friend bool operator==(Value const& lhs, Value const& rhs) {
+        return lhs.m_value == rhs.m_value;
+    }
 };
-
-bool operator==(Value const& lhs, Value const& rhs) {
-    return lhs.m_value == rhs.m_value;
-}
 
 
 TEST(Result, OK) {
