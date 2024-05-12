@@ -14,7 +14,7 @@ enum class Entry {
 };
 
 TEST(Optional, OK) {
-    auto const optional = []() -> cpt::Otional<Entry> { return Entry::default_entry; }();
+    auto const optional = []() -> cpt::Optional<Entry> { return Entry::default_entry; }();
 
     ASSERT_TRUE(optional.ok());
     ASSERT_EQ(optional.unwrap(), Entry::default_entry);
@@ -23,7 +23,7 @@ TEST(Optional, OK) {
 }
 
 TEST(Optional, Empty) {
-    auto const optional = []() -> cpt::Otional<Entry> { return {}; }();
+    auto const optional = []() -> cpt::Optional<Entry> { return {}; }();
 
     auto const exception_check = [optional]() {
         try {
