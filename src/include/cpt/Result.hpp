@@ -29,8 +29,8 @@ namespace cpt {
         std::variant<T, E> m_value;
 
     public:
-        Result(T value) : m_value{ std::in_place_index<0>, std::forward<T>(value) } { }
-        Result(Err<E> value) : m_value{ std::in_place_index<1>, std::forward<E>(value.value()) } { }
+        Result(T&& value) : m_value{ std::in_place_index<0>, std::forward<T>(value) } { }
+        Result(Err<E>&& value) : m_value{ std::in_place_index<1>, std::forward<E>(value.value()) } { }
 
         [[nodiscard]] bool ok() const {
             return m_value.index() == 0;
