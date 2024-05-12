@@ -40,14 +40,28 @@ namespace cpt {
             return not ok();
         }
 
-        [[nodiscard]] T unwrap() const {
+        [[nodiscard]] T const& unwrap() const {
             if (ok()) {
                 return std::get<0>(m_value);
             }
             throw std::logic_error("while unwrapping a result with 'unwarp'");
         }
 
-        [[nodiscard]] E unwrap_err() const {
+        [[nodiscard]] T& unwrap() {
+            if (ok()) {
+                return std::get<0>(m_value);
+            }
+            throw std::logic_error("while unwrapping a result with 'unwarp'");
+        }
+
+        [[nodiscard]] E const& unwrap_err() const {
+            if (err()) {
+                return std::get<1>(m_value);
+            }
+            throw std::logic_error("while unwrapping an result with 'unwrap_err'");
+        }
+
+        [[nodiscard]] E& unwrap_err() {
             if (err()) {
                 return std::get<1>(m_value);
             }

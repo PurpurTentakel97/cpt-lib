@@ -23,7 +23,14 @@ namespace cpt {
             return m_value.index() == 0;
         }
 
-        [[nodiscard]] T unwrap() const {
+        [[nodiscard]] T& unwrap() {
+            if (ok()) {
+                return std::get<0>(m_value);
+            }
+            throw std::logic_error("while unwrapping an optional");
+        }
+
+        [[nodiscard]] T const& unwrap() const {
             if (ok()) {
                 return std::get<0>(m_value);
             }
