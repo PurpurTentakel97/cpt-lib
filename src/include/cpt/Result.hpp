@@ -5,7 +5,7 @@
 //
 
 #pragma once
-#include <functional>
+#include <concepts>
 #include <stdexcept>
 #include <variant>
 
@@ -72,7 +72,8 @@ namespace cpt {
             return ok() ? unwrap() : other;
         }
 
-        [[nodiscard]] T unwarp_or_else(std::function<T()> const& func) const {
+        template <typename F> requires std::invocable<F>
+        [[nodiscard]] T unwarp_or_else(F const& func) const {
             return ok() ? unwrap() : func();
         }
 

@@ -5,9 +5,9 @@
 //
 
 #pragma once
-#include <functional>
 #include <stdexcept>
 #include <variant>
+#include <concepts>
 
 namespace cpt {
     template<typename T>
@@ -37,7 +37,8 @@ namespace cpt {
             throw std::logic_error("while unwrapping an optional");
         }
 
-        [[nodiscard]] T unwrap_or_else(std::function<T()> const& func) const {
+        template<typename  F> requires std::invocable<F>
+        [[nodiscard]] T unwrap_or_else(F const& func) const {
             return ok() ? unwrap() : func();
         }
 
