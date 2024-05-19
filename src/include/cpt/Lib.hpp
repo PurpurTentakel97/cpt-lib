@@ -10,3 +10,4 @@
 #include "Files.hpp"
 #include "Strings.hpp"
 #include "Types.hpp"
+#include "Vec2.hpp"

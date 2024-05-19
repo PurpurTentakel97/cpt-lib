@@ -8,10 +8,11 @@ target_sources(cpt_lib
                PUBLIC FILE_SET HEADERS
                BASE_DIRS include FILES
                include/cpt/Lib.hpp
+               include/cpt/Concepts.hpp
                include/cpt/Files.hpp
                include/cpt/Strings.hpp
                include/cpt/Types.hpp
-               include/cpt/Concepts.hpp
+               include/cpt/Vec2.hpp
 )
 
 target_include_directories(cpt_lib
