@@ -90,7 +90,7 @@ TEST(Vec2, OperatorDivide) {
     auto constexpr scalar_2 = 2;
 
     try {
-        auto const vec_2 = vec / scalar_1;
+        [[maybe_unused]] auto const vec_2 = vec / scalar_1;
         GTEST_FAIL() << "exception 'BadVec2Argument' not thrown";
     } catch (cpt::BadVec2Argument const& e) { EXPECT_STREQ(e.what(), "devision by 0"); }
 
@@ -129,30 +129,9 @@ TEST(Vec2, Normalize) {
     EXPECT_DOUBLE_EQ(cpt::Vec2i(-20, 50).normalize().magnitude(), 1.0);
 }
 
-TEST(Vec2, ToUnchecked) {
-    auto constexpr vec   = cpt::Vec2i(20, 20);
-    auto constexpr vec_2 = vec.to_unchecked<float>();
-    auto constexpr vec_3 = vec.to_unchecked<cpt::usize>();
-}
-
 TEST(Vec2, To) {
-    auto constexpr max = std::numeric_limits<double>::max();
-    auto constexpr vec = cpt::Vec2d(max, max);
-
-    try {
-        auto const vec_test = vec.to<float>();
-        GTEST_FAIL() << "Expection 'BadVec2Convertion' not thrown";
-    } catch (cpt::BadVec2Convertion const& e) {
-        EXPECT_STREQ(e.what(), "not able to convert values into new datatype");
-    }
-
-    auto constexpr max_2 = std::numeric_limits<cpt::i64>::max();
-    auto constexpr vec_2 = cpt::Vec2i64(max_2, max_2);
-
-    try {
-        auto const vec_test = vec.to<cpt::i8>();
-        GTEST_FAIL() << "Expection 'BadVec2Convertion' not thrown";
-    } catch (cpt::BadVec2Convertion const& e) {
-        EXPECT_STREQ(e.what(), "not able to convert values into new datatype");
-    }
+    auto constexpr vec   = cpt::Vec2i(20, 20);
+    [[maybe_unused]] auto constexpr vec_2 = vec.to<float>();
+    [[maybe_unused]] auto constexpr vec_3 = vec.to<cpt::usize>();
 }
+

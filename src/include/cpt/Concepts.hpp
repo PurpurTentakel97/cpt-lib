@@ -7,6 +7,8 @@
 #pragma once
 
 #include <concepts>
+#include <utility>
+#include <limits>
 
 namespace cpt {
     template<typename T, typename... Args>

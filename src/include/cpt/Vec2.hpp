@@ -10,6 +10,7 @@
 #include <cpt/Concepts.hpp>
 #include <cpt/Types.hpp>
 #include <stdexcept>
+#include <utility>
 
 namespace cpt {
     class BadVec2Convertion final : public std::out_of_range {
@@ -29,38 +30,6 @@ namespace cpt {
 
         template<IsNumeric U>
         [[nodiscard]] constexpr Vec2<U> to() const {
-            auto is_in_range{ false };
-            if constexpr (std::integral<T> and std::integral<U>) {
-                is_in_range = std::in_range<U>(x) and std::in_range<U>(y);
-            } else if constexpr (std::unsigned_integral<U>) {
-                auto constexpr max = std::numeric_limits<U>::max();
-                auto constexpr min = std::numeric_limits<U>::min();
-                // clang-format off
-                is_in_range = x >= min
-                           && x <= max
-                           && y >= min
-                           && y <= max;
-                // clang-format on
-            } else {
-                auto constexpr max = std::numeric_limits<U>::max();
-                auto constexpr min = -max;
-                // clang-format off
-                is_in_range = x >= min
-                           && x <= max
-                           && y >= min
-                           && y <= max;
-                // clang-format on
-            }
-
-            if (not is_in_range) {
-                throw BadVec2Convertion("not able to convert values into new datatype");
-            }
-
-            return to_unchecked<U>();
-        }
-
-        template<IsNumeric U>
-        [[nodiscard]] constexpr Vec2<U> to_unchecked() const {
             return { static_cast<U>(x), static_cast<U>(y) };
         }
 
