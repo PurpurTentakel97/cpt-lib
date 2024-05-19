@@ -31,7 +31,7 @@ if (${cpt_lib_tests})
     add_subdirectory(${PROJECT_SOURCE_DIR}/test)
 endif ()
 
-install(TARGETS cpt_lib EXPORT cpt-lib-targets ARCHIVE
+install(TARGETS cpt-lib EXPORT cpt-lib-targets ARCHIVE
         FILE_SET HEADERS
 )
 install(EXPORT cpt-lib-targets
