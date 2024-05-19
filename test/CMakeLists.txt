@@ -9,7 +9,7 @@ add_executable(lib_test
 target_link_libraries(lib_test
                       PRIVATE
                       cpt_lib_project_options
-                      cpt_lib
+                      cpt-lib
                       GTest::gtest_main
 )
 
