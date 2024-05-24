@@ -7,8 +7,8 @@
 #pragma once
 
 #include <cmath>
-#include <cpt/Concepts.hpp>
-#include <cpt/Types.hpp>
+#include <cpt/concepts.hpp>
+#include <cpt/types.hpp>
 #include <stdexcept>
 #include <utility>
 

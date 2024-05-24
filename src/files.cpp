@@ -4,7 +4,7 @@
 // 08.05.24
 //
 
-#include <cpt/Files.hpp>
+#include <cpt/files.hpp>
 #include <fstream>
 #include <sstream>
 

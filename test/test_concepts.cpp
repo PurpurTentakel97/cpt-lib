@@ -4,7 +4,7 @@
 // 08.05.24
 //
 
-#include <cpt/Concepts.hpp>
+#include <cpt/concepts.hpp>
 
 using test_ty = int;
 

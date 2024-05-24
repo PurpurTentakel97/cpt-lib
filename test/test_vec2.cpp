@@ -5,7 +5,7 @@
 //
 
 #include <cmath>
-#include <cpt/Vec2.hpp>
+#include <cpt/vec2.hpp>
 #include <gtest/gtest.h>
 
 TEST(Vec2, OperatorAddAssign) {

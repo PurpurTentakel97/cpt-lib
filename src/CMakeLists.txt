@@ -2,17 +2,17 @@ add_library(cpt-lib STATIC)
 
 target_sources(cpt-lib
                PRIVATE
-               Files.cpp
-               Strings.cpp
+               files.cpp
+               strings.cpp
 
                PUBLIC FILE_SET HEADERS
                BASE_DIRS include FILES
-               include/cpt/Lib.hpp
-               include/cpt/Concepts.hpp
-               include/cpt/Files.hpp
-               include/cpt/Strings.hpp
-               include/cpt/Types.hpp
-               include/cpt/Vec2.hpp
+               include/cpt/concepts.hpp
+               include/cpt/files.hpp
+               include/cpt/lib.hpp
+               include/cpt/strings.hpp
+               include/cpt/types.hpp
+               include/cpt/vec2.hpp
 )
 
 target_include_directories(cpt-lib
