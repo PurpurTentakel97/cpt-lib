@@ -10,7 +10,6 @@
 #include <cpt/concepts.hpp>
 #include <cpt/types.hpp>
 #include <stdexcept>
-#include <utility>
 
 namespace cpt {
     class BadVec2Convertion final : public std::out_of_range {
@@ -97,19 +96,19 @@ namespace cpt {
         }
     };
 
-    using Vec2f = Vec2<float>;
-    using Vec2d = Vec2<double>;
-    using Vec2i = Vec2<int>;
+    using Vec2_f = Vec2<float>;
+    using Vec2_d = Vec2<double>;
+    using Vec2_i = Vec2<int>;
 
-    using Vec2u8  = Vec2<u8>;
-    using Vec2u16 = Vec2<u16>;
-    using Vec2u32 = Vec2<u32>;
-    using Vec2u64 = Vec2<u64>;
+    using Vec2_u8  = Vec2<u8>;
+    using Vec2_u16 = Vec2<u16>;
+    using Vec2_u32 = Vec2<u32>;
+    using Vec2_u64 = Vec2<u64>;
 
-    using Vec2i8  = Vec2<i8>;
-    using Vec2i16 = Vec2<i16>;
-    using Vec2i32 = Vec2<i32>;
-    using Vec2i64 = Vec2<i64>;
+    using Vec2_i8  = Vec2<i8>;
+    using Vec2_i16 = Vec2<i16>;
+    using Vec2_i32 = Vec2<i32>;
+    using Vec2_i64 = Vec2<i64>;
 
-    using Vec2usize = Vec2<usize>;
+    using Vec2_usize = Vec2<usize>;
 } // namespace cpt

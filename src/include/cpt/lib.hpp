@@ -6,8 +6,9 @@
 
 #pragma once
 
-#include "concepts.hpp"
-#include "files.hpp"
-#include "strings.hpp"
-#include "types.hpp"
-#include "vec2.hpp"
+#include <cpt/concepts.hpp>
+#include <cpt/files.hpp>
+#include <cpt/rect.hpp>
+#include <cpt/strings.hpp>
+#include <cpt/types.hpp>
+#include <cpt/vec2.hpp>
