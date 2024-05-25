@@ -4,7 +4,7 @@
 // 05.05.24
 //
 
-#include <cpt/Strings.hpp>
+#include <cpt/strings.hpp>
 #include <gtest/gtest.h>
 #include <tuple>
 

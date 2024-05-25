@@ -5,12 +5,12 @@
 //
 
 #include <cmath>
-#include <cpt/Vec2.hpp>
+#include <cpt/vec2.hpp>
 #include <gtest/gtest.h>
 
 TEST(Vec2, OperatorAddAssign) {
-    auto vec_1           = cpt::Vec2i{ 1, 2 };
-    auto constexpr vec_2 = cpt::Vec2i{ 3, 4 };
+    auto vec_1           = cpt::Vec2_i{ 1, 2 };
+    auto constexpr vec_2 = cpt::Vec2_i{ 3, 4 };
     vec_1 += vec_2;
 
     EXPECT_EQ(vec_1.x, 4);
@@ -18,8 +18,8 @@ TEST(Vec2, OperatorAddAssign) {
 }
 
 TEST(Vec2, OperatorMinusAssign) {
-    auto vec_1           = cpt::Vec2i{ 10, 2 };
-    auto constexpr vec_2 = cpt::Vec2i{ 3, 4 };
+    auto vec_1           = cpt::Vec2_i{ 10, 2 };
+    auto constexpr vec_2 = cpt::Vec2_i{ 3, 4 };
     vec_1 -= vec_2;
 
     EXPECT_EQ(vec_1.x, 7);
@@ -27,7 +27,7 @@ TEST(Vec2, OperatorMinusAssign) {
 }
 
 TEST(Vec2, OperatorMultiplyAssign) {
-    auto vec              = cpt::Vec2i{ 2, 3 };
+    auto vec              = cpt::Vec2_i{ 2, 3 };
     auto constexpr scalar = 2;
     vec *= scalar;
 
@@ -36,7 +36,7 @@ TEST(Vec2, OperatorMultiplyAssign) {
 }
 
 TEST(Vec2, OperatorDivideAssign) {
-    auto vec                = cpt::Vec2i{ 4, 6 };
+    auto vec                = cpt::Vec2_i{ 4, 6 };
     auto constexpr scalar_1 = 0;
     auto constexpr scalar_2 = 2;
 
@@ -55,8 +55,8 @@ TEST(Vec2, OperatorDivideAssign) {
 }
 
 TEST(Vec2, OperatorPlus) {
-    auto constexpr vec_1 = cpt::Vec2i{ 1, 2 };
-    auto constexpr vec_2 = cpt::Vec2i{ 3, 4 };
+    auto constexpr vec_1 = cpt::Vec2_i{ 1, 2 };
+    auto constexpr vec_2 = cpt::Vec2_i{ 3, 4 };
     auto constexpr vec_3 = vec_1 + vec_2;
 
     EXPECT_EQ(vec_3.x, 4);
@@ -64,8 +64,8 @@ TEST(Vec2, OperatorPlus) {
 }
 
 TEST(Vec2, OperatorMinus) {
-    auto constexpr vec_1 = cpt::Vec2i{ 10, 2 };
-    auto constexpr vec_2 = cpt::Vec2i{ 3, 4 };
+    auto constexpr vec_1 = cpt::Vec2_i{ 10, 2 };
+    auto constexpr vec_2 = cpt::Vec2_i{ 3, 4 };
     auto constexpr vec_3 = vec_1 - vec_2;
 
     EXPECT_EQ(vec_3.x, 7);
@@ -73,7 +73,7 @@ TEST(Vec2, OperatorMinus) {
 }
 
 TEST(Vec2, OperatorMultiply) {
-    auto constexpr vec    = cpt::Vec2i{ 2, 3 };
+    auto constexpr vec    = cpt::Vec2_i{ 2, 3 };
     auto constexpr scalar = 2;
     auto constexpr vec_2  = vec * scalar;
     auto constexpr vec_3  = scalar * vec;
@@ -85,7 +85,7 @@ TEST(Vec2, OperatorMultiply) {
 }
 
 TEST(Vec2, OperatorDivide) {
-    auto constexpr vec      = cpt::Vec2i{ 4, 6 };
+    auto constexpr vec      = cpt::Vec2_i{ 4, 6 };
     auto constexpr scalar_1 = 0;
     auto constexpr scalar_2 = 2;
 
@@ -100,8 +100,8 @@ TEST(Vec2, OperatorDivide) {
 }
 
 TEST(Vec2, OperatorSpaceship) {
-    auto constexpr vec_1 = cpt::Vec2i(1, 4);
-    auto constexpr vec_2 = cpt::Vec2i(2, 3);
+    auto constexpr vec_1 = cpt::Vec2_i(1, 4);
+    auto constexpr vec_2 = cpt::Vec2_i(2, 3);
 
     EXPECT_TRUE(vec_1 == vec_1);
 
@@ -118,20 +118,19 @@ TEST(Vec2, OperatorSpaceship) {
 }
 
 TEST(Vec2, Magnetude) {
-    EXPECT_DOUBLE_EQ(cpt::Vec2i(1, 1).magnitude(), std::sqrt(2));
-    EXPECT_DOUBLE_EQ(cpt::Vec2i(2, 2).magnitude(), std::sqrt(8));
-    EXPECT_DOUBLE_EQ(cpt::Vec2i(1, 2).magnitude(), std::sqrt(5));
+    EXPECT_DOUBLE_EQ(cpt::Vec2_i(1, 1).magnitude(), std::sqrt(2));
+    EXPECT_DOUBLE_EQ(cpt::Vec2_i(2, 2).magnitude(), std::sqrt(8));
+    EXPECT_DOUBLE_EQ(cpt::Vec2_i(1, 2).magnitude(), std::sqrt(5));
 }
 
 TEST(Vec2, Normalize) {
-    EXPECT_DOUBLE_EQ(cpt::Vec2i(1, 1).normalize().magnitude(), 1.0);
-    EXPECT_DOUBLE_EQ(cpt::Vec2i(2, 10).normalize().magnitude(), 1.0);
-    EXPECT_DOUBLE_EQ(cpt::Vec2i(-20, 50).normalize().magnitude(), 1.0);
+    EXPECT_DOUBLE_EQ(cpt::Vec2_i(1, 1).normalize().magnitude(), 1.0);
+    EXPECT_DOUBLE_EQ(cpt::Vec2_i(2, 10).normalize().magnitude(), 1.0);
+    EXPECT_DOUBLE_EQ(cpt::Vec2_i(-20, 50).normalize().magnitude(), 1.0);
 }
 
 TEST(Vec2, To) {
-    auto constexpr vec   = cpt::Vec2i(20, 20);
+    auto constexpr vec   = cpt::Vec2_i(20, 20);
     [[maybe_unused]] auto constexpr vec_2 = vec.to<float>();
     [[maybe_unused]] auto constexpr vec_3 = vec.to<cpt::usize>();
 }
-

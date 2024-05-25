@@ -5,7 +5,7 @@
 //
 
 #include <concepts>
-#include <cpt/Types.hpp>
+#include <cpt/types.hpp>
 
 static_assert(std::same_as<cpt::u8, std::uint8_t>);
 static_assert(std::same_as<cpt::u16, std::uint16_t>);
