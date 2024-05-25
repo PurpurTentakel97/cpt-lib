@@ -3,6 +3,7 @@ add_executable(lib_test
                test_files.cpp
                test_strings.cpp
                test_types.cpp
+               test_unique_value.cpp
                test_vec2.cpp
 )
 
