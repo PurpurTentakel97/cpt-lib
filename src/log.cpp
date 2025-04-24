@@ -17,17 +17,21 @@ namespace cpt {
             auto const local         = std::chrono::current_zone()->to_local(now);
             auto const local_seconds = std::chrono::floor<std::chrono::seconds>(local);
             return std::vformat(s_format, std::make_format_args(local_seconds));
+
         } catch (std::format_error const& e) {
+            std::stringstream stream{};
+            stream << "Error while formatting timestamp: '" << s_format << "'\n"
+                   << "error: '" << e.what() << "'\n";
             std::lock_guard lock{ s_mutex };
-            std::cerr << "Error while formatting timestamp: '" << s_format << "'\n"
-                      << "error: '" << e.what() << "'\n"
-                      << std::flush;
+            std::cerr << stream.str();
             return "TIMESTAMP";
+
         } catch (std::bad_alloc const& e) {
+            std::stringstream stream{};
+            stream << "bad alloc while printing timestamp: '" << s_format << "'\n"
+                   << "error: '" << e.what() << "'\n";
             std::lock_guard lock{ s_mutex };
-            std::cerr << "bad alloc while printing timestamp: '" << s_format << "'\n"
-                      << "error: '" << e.what() << "'\n"
-                      << std::flush;
+            std::cerr << stream.str();
             return "TIMESTAMP";
         }
     }

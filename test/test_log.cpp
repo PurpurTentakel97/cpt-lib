@@ -9,25 +9,28 @@
 #include <gtest/gtest.h>
 #include <tuple>
 
-class LogLevel : public testing::TestWithParam<std::tuple<cpt::log::Level, std::function<void()>, std::string>> { };
+struct BasicLogLevelValues final {
+    cpt::log::Level const level;
+    std::function<void()> const print_debug;
+    std::function<void()> const print_release;
+    std::string const result;
+};
+
+class LogLevel : public testing::TestWithParam<BasicLogLevelValues> { };
 
 TEST_P(LogLevel, LOG_LEVEL_TRACE) {
-    auto const level    = std::get<0>(GetParam());
-    auto const func     = std::get<1>(GetParam());
-    auto const expected = std::get<2>(GetParam());
+    auto const& params = GetParam();
 
-    cpt::log::set_level(level);
+    cpt::log::set_level(params.level);
 
-    std::ostringstream const oss;
+    std::ostringstream oss{};
     auto* old_buf = std::cout.rdbuf();
     std::cout.rdbuf(oss.rdbuf());
 
-    func();
+    params.print_debug();
 
-    std::cout.rdbuf(old_buf);
-
-    auto const output = [&oss]() {
-        auto const str = oss.str();
+    auto const output_debug = [&oss]() {
+        auto str = oss.str();
         if (str.size() > 9) {
             return str.substr(9);
         }
@@ -35,60 +38,213 @@ TEST_P(LogLevel, LOG_LEVEL_TRACE) {
         return str;
     }();
 
-    EXPECT_EQ(expected, output);
+#ifndef NDEBUG
+    EXPECT_EQ(params.result, output_debug);
+#else
+    EXPECT_EQ("", output_debug);
+#endif
+
+    oss = std::ostringstream{};
+    std::cout.rdbuf(oss.rdbuf());
+
+    params.print_release();
+
+    auto const output_release = [&oss]() {
+        auto str = oss.str();
+        if (str.size() > 9) {
+            return str.substr(9);
+        }
+
+        return str;
+    }();
+
+    EXPECT_EQ(params.result, output_release);
+
+    std::cout.rdbuf(old_buf);
 }
 
 INSTANTIATE_TEST_SUITE_P(LOG,
                          LogLevel,
                          ::testing::Values(
-                                 // clang-format off
-// trace
-std::make_tuple(cpt::log::Level::Trace,    [] { cpt::log::trace("message"); }, "[trace]    message\n"),
-std::make_tuple(cpt::log::Level::Debug,    [] { cpt::log::trace("message"); }, ""),
-std::make_tuple(cpt::log::Level::Info,     [] { cpt::log::trace("message"); }, ""),
-std::make_tuple(cpt::log::Level::Warn,     [] { cpt::log::trace("message"); }, ""),
-std::make_tuple(cpt::log::Level::Error,    [] { cpt::log::trace("message"); }, ""),
-std::make_tuple(cpt::log::Level::Critical, [] { cpt::log::trace("message"); }, ""),
-std::make_tuple(cpt::log::Level::None,     [] { cpt::log::trace("message"); }, ""),
-// debug
-std::make_tuple(cpt::log::Level::Trace,    [] { cpt::log::debug("message"); }, "[debug]    message\n"),
-std::make_tuple(cpt::log::Level::Debug,    [] { cpt::log::debug("message"); }, "[debug]    message\n"),
-std::make_tuple(cpt::log::Level::Info,     [] { cpt::log::debug("message"); }, ""),
-std::make_tuple(cpt::log::Level::Warn,     [] { cpt::log::debug("message"); }, ""),
-std::make_tuple(cpt::log::Level::Error,    [] { cpt::log::debug("message"); }, ""),
-std::make_tuple(cpt::log::Level::Critical, [] { cpt::log::debug("message"); }, ""),
-std::make_tuple(cpt::log::Level::None,     [] { cpt::log::debug("message"); }, ""),
-// info
-std::make_tuple(cpt::log::Level::Trace,    [] { cpt::log::info("message"); }, "[Info]     message\n"),
-std::make_tuple(cpt::log::Level::Debug,    [] { cpt::log::info("message"); }, "[Info]     message\n"),
-std::make_tuple(cpt::log::Level::Info,     [] { cpt::log::info("message"); }, "[Info]     message\n"),
-std::make_tuple(cpt::log::Level::Warn,     [] { cpt::log::info("message"); }, ""),
-std::make_tuple(cpt::log::Level::Error,    [] { cpt::log::info("message"); }, ""),
-std::make_tuple(cpt::log::Level::Critical, [] { cpt::log::info("message"); }, ""),
-std::make_tuple(cpt::log::Level::None,     [] { cpt::log::info("message"); }, ""),
-// warn
-std::make_tuple(cpt::log::Level::Trace,    [] { cpt::log::warn("message"); }, "[Warn]     message\n"),
-std::make_tuple(cpt::log::Level::Debug,    [] { cpt::log::warn("message"); }, "[Warn]     message\n"),
-std::make_tuple(cpt::log::Level::Info,     [] { cpt::log::warn("message"); }, "[Warn]     message\n"),
-std::make_tuple(cpt::log::Level::Warn,     [] { cpt::log::warn("message"); }, "[Warn]     message\n"),
-std::make_tuple(cpt::log::Level::Error,    [] { cpt::log::warn("message"); }, ""),
-std::make_tuple(cpt::log::Level::Critical, [] { cpt::log::warn("message"); }, ""),
-std::make_tuple(cpt::log::Level::None,     [] { cpt::log::warn("message"); }, ""),
-// error
-std::make_tuple(cpt::log::Level::Trace,    [] { cpt::log::error("message"); }, "[ERROR]    message\n"),
-std::make_tuple(cpt::log::Level::Debug,    [] { cpt::log::error("message"); }, "[ERROR]    message\n"),
-std::make_tuple(cpt::log::Level::Info,     [] { cpt::log::error("message"); }, "[ERROR]    message\n"),
-std::make_tuple(cpt::log::Level::Warn,     [] { cpt::log::error("message"); }, "[ERROR]    message\n"),
-std::make_tuple(cpt::log::Level::Error,    [] { cpt::log::error("message"); }, "[ERROR]    message\n"),
-std::make_tuple(cpt::log::Level::Critical, [] { cpt::log::error("message"); }, ""),
-std::make_tuple(cpt::log::Level::None,     [] { cpt::log::error("message"); }, ""),
-// error
-std::make_tuple(cpt::log::Level::Trace,    [] { cpt::log::critical("message"); }, "[CRITICAL] message\n"),
-std::make_tuple(cpt::log::Level::Debug,    [] { cpt::log::critical("message"); }, "[CRITICAL] message\n"),
-std::make_tuple(cpt::log::Level::Info,     [] { cpt::log::critical("message"); }, "[CRITICAL] message\n"),
-std::make_tuple(cpt::log::Level::Warn,     [] { cpt::log::critical("message"); }, "[CRITICAL] message\n"),
-std::make_tuple(cpt::log::Level::Error,    [] { cpt::log::critical("message"); }, "[CRITICAL] message\n"),
-std::make_tuple(cpt::log::Level::Critical, [] { cpt::log::critical("message"); }, "[CRITICAL] message\n"),
-std::make_tuple(cpt::log::Level::None,     [] { cpt::log::critical("message"); }, "")
-                                 // clang-format on
-                                 ));
+                                 // trace
+                                 BasicLogLevelValues{ cpt::log::Level::Trace,
+                                                      [] { cpt::log::trace("message"); },
+                                                      [] { cpt::log::r_trace("message"); },
+                                                      "[trace]    message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Debug,
+                                                      [] { cpt::log::trace("message"); },
+                                                      [] { cpt::log::r_trace("message"); },
+                                                      "" },
+                                 BasicLogLevelValues{ cpt::log::Level::Info,
+                                                      [] { cpt::log::trace("message"); },
+                                                      [] { cpt::log::r_trace("message"); },
+                                                      "" },
+                                 BasicLogLevelValues{ cpt::log::Level::Warn,
+                                                      [] { cpt::log::trace("message"); },
+                                                      [] { cpt::log::r_trace("message"); },
+                                                      "" },
+                                 BasicLogLevelValues{ cpt::log::Level::Error,
+                                                      [] { cpt::log::trace("message"); },
+                                                      [] { cpt::log::r_trace("message"); },
+                                                      "" },
+                                 BasicLogLevelValues{ cpt::log::Level::Critical,
+                                                      [] { cpt::log::trace("message"); },
+                                                      [] { cpt::log::r_trace("message"); },
+                                                      "" },
+                                 BasicLogLevelValues{ cpt::log::Level::None,
+                                                      [] { cpt::log::trace("message"); },
+                                                      [] { cpt::log::r_trace("message"); },
+                                                      "" },
+
+                                 // debug
+                                 BasicLogLevelValues{ cpt::log::Level::Trace,
+                                                      [] { cpt::log::debug("message"); },
+                                                      [] { cpt::log::r_debug("message"); },
+                                                      "[debug]    message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Debug,
+                                                      [] { cpt::log::debug("message"); },
+                                                      [] { cpt::log::r_debug("message"); },
+                                                      "[debug]    message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Info,
+                                                      [] { cpt::log::debug("message"); },
+                                                      [] { cpt::log::r_debug("message"); },
+                                                      "" },
+                                 BasicLogLevelValues{ cpt::log::Level::Warn,
+                                                      [] { cpt::log::debug("message"); },
+                                                      [] { cpt::log::r_debug("message"); },
+                                                      "" },
+                                 BasicLogLevelValues{ cpt::log::Level::Error,
+                                                      [] { cpt::log::debug("message"); },
+                                                      [] { cpt::log::r_debug("message"); },
+                                                      "" },
+                                 BasicLogLevelValues{ cpt::log::Level::Critical,
+                                                      [] { cpt::log::debug("message"); },
+                                                      [] { cpt::log::r_debug("message"); },
+                                                      "" },
+                                 BasicLogLevelValues{ cpt::log::Level::None,
+                                                      [] { cpt::log::debug("message"); },
+                                                      [] { cpt::log::r_debug("message"); },
+                                                      "" },
+
+                                 // info
+                                 BasicLogLevelValues{ cpt::log::Level::Trace,
+                                                      [] { cpt::log::info("message"); },
+                                                      [] { cpt::log::r_info("message"); },
+                                                      "[Info]     message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Debug,
+                                                      [] { cpt::log::info("message"); },
+                                                      [] { cpt::log::r_info("message"); },
+                                                      "[Info]     message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Info,
+                                                      [] { cpt::log::info("message"); },
+                                                      [] { cpt::log::r_info("message"); },
+                                                      "[Info]     message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Warn,
+                                                      [] { cpt::log::info("message"); },
+                                                      [] { cpt::log::r_info("message"); },
+                                                      "" },
+                                 BasicLogLevelValues{ cpt::log::Level::Error,
+                                                      [] { cpt::log::info("message"); },
+                                                      [] { cpt::log::r_info("message"); },
+                                                      "" },
+                                 BasicLogLevelValues{ cpt::log::Level::Critical,
+                                                      [] { cpt::log::info("message"); },
+                                                      [] { cpt::log::r_info("message"); },
+                                                      "" },
+                                 BasicLogLevelValues{ cpt::log::Level::None,
+                                                      [] { cpt::log::info("message"); },
+                                                      [] { cpt::log::r_info("message"); },
+                                                      "" },
+
+
+                                 // warn
+                                 BasicLogLevelValues{ cpt::log::Level::Trace,
+                                                      [] { cpt::log::warn("message"); },
+                                                      [] { cpt::log::r_warn("message"); },
+                                                      "[Warn]     message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Debug,
+                                                      [] { cpt::log::warn("message"); },
+                                                      [] { cpt::log::r_warn("message"); },
+                                                      "[Warn]     message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Info,
+                                                      [] { cpt::log::warn("message"); },
+                                                      [] { cpt::log::r_warn("message"); },
+                                                      "[Warn]     message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Warn,
+                                                      [] { cpt::log::warn("message"); },
+                                                      [] { cpt::log::r_warn("message"); },
+                                                      "[Warn]     message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Error,
+                                                      [] { cpt::log::warn("message"); },
+                                                      [] { cpt::log::r_warn("message"); },
+                                                      "" },
+                                 BasicLogLevelValues{ cpt::log::Level::Critical,
+                                                      [] { cpt::log::warn("message"); },
+                                                      [] { cpt::log::r_warn("message"); },
+                                                      "" },
+                                 BasicLogLevelValues{ cpt::log::Level::None,
+                                                      [] { cpt::log::warn("message"); },
+                                                      [] { cpt::log::r_warn("message"); },
+                                                      "" },
+
+
+                                 // error
+                                 BasicLogLevelValues{ cpt::log::Level::Trace,
+                                                      [] { cpt::log::error("message"); },
+                                                      [] { cpt::log::r_error("message"); },
+                                                      "[ERROR]    message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Debug,
+                                                      [] { cpt::log::error("message"); },
+                                                      [] { cpt::log::r_error("message"); },
+                                                      "[ERROR]    message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Info,
+                                                      [] { cpt::log::error("message"); },
+                                                      [] { cpt::log::r_error("message"); },
+                                                      "[ERROR]    message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Warn,
+                                                      [] { cpt::log::error("message"); },
+                                                      [] { cpt::log::r_error("message"); },
+                                                      "[ERROR]    message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Error,
+                                                      [] { cpt::log::error("message"); },
+                                                      [] { cpt::log::r_error("message"); },
+                                                      "[ERROR]    message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Critical,
+                                                      [] { cpt::log::error("message"); },
+                                                      [] { cpt::log::r_error("message"); },
+                                                      "" },
+                                 BasicLogLevelValues{ cpt::log::Level::None,
+                                                      [] { cpt::log::error("message"); },
+                                                      [] { cpt::log::r_error("message"); },
+                                                      "" },
+
+
+                                 // error
+                                 BasicLogLevelValues{ cpt::log::Level::Trace,
+                                                      [] { cpt::log::critical("message"); },
+                                                      [] { cpt::log::r_critical("message"); },
+                                                      "[CRITICAL] message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Debug,
+                                                      [] { cpt::log::critical("message"); },
+                                                      [] { cpt::log::r_critical("message"); },
+                                                      "[CRITICAL] message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Info,
+                                                      [] { cpt::log::critical("message"); },
+                                                      [] { cpt::log::r_critical("message"); },
+                                                      "[CRITICAL] message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Warn,
+                                                      [] { cpt::log::critical("message"); },
+                                                      [] { cpt::log::r_critical("message"); },
+                                                      "[CRITICAL] message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Error,
+                                                      [] { cpt::log::critical("message"); },
+                                                      [] { cpt::log::r_critical("message"); },
+                                                      "[CRITICAL] message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::Critical,
+                                                      [] { cpt::log::critical("message"); },
+                                                      [] { cpt::log::r_critical("message"); },
+                                                      "[CRITICAL] message\n" },
+                                 BasicLogLevelValues{ cpt::log::Level::None,
+                                                      [] { cpt::log::critical("message"); },
+                                                      [] { cpt::log::r_critical("message"); },
+                                                      "" }));

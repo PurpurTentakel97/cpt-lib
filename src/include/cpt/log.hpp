@@ -8,6 +8,7 @@
 #include <format>
 #include <iostream>
 #include <mutex>
+#include <sstream>
 #include <string>
 #include <utility>
 
@@ -47,18 +48,22 @@ namespace cpt {
 
                 std::lock_guard lock{ s_mutex };
                 std::cout << to_print;
+
             } catch (std::format_error const& e) {
+                std::stringstream stream{};
+                stream << "Error while formatting message: '" << message << "' | Args count: " << sizeof...(args)
+                       << "\n"
+                       << "error: '" << e.what() << "'\n";
                 std::lock_guard lock{ s_mutex };
-                std::cerr << "Error while formatting message: '" << message << "' | Args count: " << sizeof...(args)
-                          << "\n"
-                          << "error: '" << e.what() << "'\n"
-                          << std::flush;
+                std::cerr << stream.str();
+
             } catch (std::bad_alloc const& e) {
+                std::stringstream stream{};
+                stream << "bad alloc while printing message: '" << message << "' | Args count: " << sizeof...(args)
+                       << '\n'
+                       << "error: '" << e.what() << "'\n";
                 std::lock_guard lock{ s_mutex };
-                std::cerr << "bad alloc while printing message: '" << message << "' | Args count: " << sizeof...(args)
-                          << '\n'
-                          << "error: '" << e.what() << "'\n"
-                          << std::flush;
+                std::cerr << stream.str();
             }
         }
 
@@ -96,7 +101,7 @@ namespace cpt {
          * @param args that gets formatted into the message
          */
         template<typename... Args>
-        static void critical(std::string const& message, Args&&... args) {
+        static void critical([[maybe_unused]] std::string const& message, [[maybe_unused]] Args&&... args) {
 #ifndef NDEBUG
             r_critical(message, std::forward<Args>(args)...);
 #endif
@@ -124,7 +129,7 @@ namespace cpt {
          * @param args that gets formatted into the message
          */
         template<typename... Args>
-        static void error(std::string const& message, Args&&... args) {
+        static void error([[maybe_unused]] std::string const& message, [[maybe_unused]] Args&&... args) {
 #ifndef NDEBUG
             r_error(message, std::forward<Args>(args)...);
 #endif
@@ -152,7 +157,7 @@ namespace cpt {
          * @param args that gets formatted into the message
          */
         template<typename... Args>
-        static void warn(std::string const& message, Args&&... args) {
+        static void warn([[maybe_unused]] std::string const& message, [[maybe_unused]] Args&&... args) {
 #ifndef NDEBUG
             r_warn(message, std::forward<Args>(args)...);
 #endif
@@ -180,7 +185,7 @@ namespace cpt {
          * @param args that gets formatted into the message
          */
         template<typename... Args>
-        static void info(std::string const& message, Args&&... args) {
+        static void info([[maybe_unused]] std::string const& message, [[maybe_unused]] Args&&... args) {
 #ifndef NDEBUG
             r_info(message, std::forward<Args>(args)...);
 #endif
@@ -208,7 +213,7 @@ namespace cpt {
          * @param args that gets formatted into the message
          */
         template<typename... Args>
-        static void debug(std::string const& message, Args&&... args) {
+        static void debug([[maybe_unused]] std::string const& message, [[maybe_unused]] Args&&... args) {
 #ifndef NDEBUG
             r_debug(message, std::forward<Args>(args)...);
 #endif
@@ -236,7 +241,7 @@ namespace cpt {
          * @param args that gets formatted into the message
          */
         template<typename... Args>
-        static void trace(std::string const& message, Args&&... args) {
+        static void trace([[maybe_unused]] std::string const& message, [[maybe_unused]] Args&&... args) {
 #ifndef NDEBUG
             r_trace(message, std::forward<Args>(args)...);
 #endif
