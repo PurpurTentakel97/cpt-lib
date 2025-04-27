@@ -48,21 +48,10 @@ namespace cpt {
 
         template<typename... Args>
         static void print(std::string const& level_text, std::format_string<Args...> const message, Args&&... args) {
-            try {
-                auto const to_print = std::format(
-                        "{} {} {}\n", time(), level_text, std::format(message, std::forward<Args>(args)...));
-
-                std::lock_guard lock{ s_mutex };
-                std::cout << to_print;
-
-            } catch (std::bad_alloc const& e) {
-                std::stringstream stream{};
-                stream << "bad alloc while printing message: '" << message.get() << "' | Args count: " << sizeof...(args)
-                       << '\n'
-                       << "error: '" << e.what() << "'\n";
-                std::lock_guard lock{ s_mutex };
-                std::cerr << stream.str();
-            }
+            auto const to_print =
+                    std::format("{} {} {}\n", time(), level_text, std::format(message, std::forward<Args>(args)...));
+            std::lock_guard lock{ s_mutex };
+            std::cout << to_print;
         }
 
     public:

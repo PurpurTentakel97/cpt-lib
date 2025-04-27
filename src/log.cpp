@@ -11,21 +11,10 @@ namespace cpt {
     }
 
     std::string log::time() {
-        try {
-            auto const now                = std::chrono::system_clock::now();
-            auto const local              = std::chrono::current_zone()->to_local(now);
-            auto const local_seconds = std::chrono::floor<std::chrono::seconds>(local);
-            return std::format(s_format, local_seconds);
-
-        }
-        catch (std::bad_alloc const& e) {
-            std::stringstream stream{};
-            stream << "bad alloc while printing timestamp: '" << s_format.get() << "'\n"
-                   << "error: '" << e.what() << "'\n";
-            std::lock_guard lock{ s_mutex };
-            std::cerr << stream.str();
-            return "TIMESTAMP";
-        }
+        auto const now           = std::chrono::system_clock::now();
+        auto const local         = std::chrono::current_zone()->to_local(now);
+        auto const local_seconds = std::chrono::floor<std::chrono::seconds>(local);
+        return std::format(s_format, local_seconds);
     }
 
     void log::set_level(Level const level) {
