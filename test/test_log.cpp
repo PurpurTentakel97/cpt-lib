@@ -252,18 +252,18 @@ INSTANTIATE_TEST_SUITE_P(LOG,
                                                       [] { cpt::log::r_critical("message"); },
                                                       "" }));
 
-struct TimePointLogLevelValues final {
+struct TimePointLogValues final {
     cpt::log::TimePointFormat const format;
     std::string regex_str;
 
-    explicit TimePointLogLevelValues(cpt::log::TimePointFormat const format_, std::string regex_str_)
+    explicit TimePointLogValues(cpt::log::TimePointFormat const format_, std::string regex_str_)
         : format{ format_ },
           regex_str{ std::move(regex_str_) } { }
 };
 
-class TimePointLogLevel : public testing::TestWithParam<TimePointLogLevelValues> { };
+class TimePointLog : public testing::TestWithParam<TimePointLogValues> { };
 
-TEST_P(TimePointLogLevel, TIME_POINT) {
+TEST_P(TimePointLog, TIME_POINT) {
     auto const& params = GetParam();
 
     std::ostringstream const oss{};
@@ -286,8 +286,8 @@ TEST_P(TimePointLogLevel, TIME_POINT) {
 }
 
 INSTANTIATE_TEST_SUITE_P(TIME_POINT,
-                         TimePointLogLevel,
-                         ::testing::Values(TimePointLogLevelValues{ "{:%H:%M:%S}", "\\d\\d:\\d\\d:\\d\\d.+\\n" },
-                                           TimePointLogLevelValues{
+                         TimePointLog,
+                         ::testing::Values(TimePointLogValues{ "{:%H:%M:%S}", "\\d\\d:\\d\\d:\\d\\d.+\\n" },
+                                           TimePointLogValues{
                                                    "{:%d.%m.%Y %H:%M:%S}",
-                                                   "\\d\\d\\.\\d\\d\\.\\d\\d\\d\\d \\d\\d:\\d\\d:\\d\\d.+\\n" } ));
+                                                   "\\d\\d\\.\\d\\d\\.\\d\\d\\d\\d \\d\\d:\\d\\d:\\d\\d.+\\n" }));
