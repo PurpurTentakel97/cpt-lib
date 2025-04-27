@@ -7,6 +7,7 @@
 #include <cpt/log.hpp>
 #include <gtest/gtest-param-test.h>
 #include <gtest/gtest.h>
+#include <regex>
 #include <tuple>
 
 struct BasicLogLevelValues final {
@@ -18,7 +19,7 @@ struct BasicLogLevelValues final {
 
 class LogLevel : public testing::TestWithParam<BasicLogLevelValues> { };
 
-TEST_P(LogLevel, LOG_LEVEL_TRACE) {
+TEST_P(LogLevel, LOG_LEVEL) {
     // testing debug call
     auto const& params = GetParam();
 
@@ -250,3 +251,43 @@ INSTANTIATE_TEST_SUITE_P(LOG,
                                                       [] { cpt::log::critical("message"); },
                                                       [] { cpt::log::r_critical("message"); },
                                                       "" }));
+
+struct TimePointLogLevelValues final {
+    cpt::log::TimePointFormat const format;
+    std::string regex_str;
+
+    explicit TimePointLogLevelValues(cpt::log::TimePointFormat const format_, std::string regex_str_)
+        : format{ format_ },
+          regex_str{ std::move(regex_str_) } { }
+};
+
+class TimePointLogLevel : public testing::TestWithParam<TimePointLogLevelValues> { };
+
+TEST_P(TimePointLogLevel, TIME_POINT) {
+    auto const& params = GetParam();
+
+    std::ostringstream const oss{};
+    auto* old_buf = std::cout.rdbuf();
+    std::cout.rdbuf(oss.rdbuf());
+
+    cpt::log::set_level(cpt::log::Level::Info);
+    cpt::log::set_format(params.format);
+    cpt::log::r_info("");
+
+    auto const printed = oss.str();
+
+    EXPECT_TRUE(std::regex_match(printed, std::regex{ params.regex_str }))
+            << '\n'
+            << "time_stamp_format: '" << params.format.get() << "'\n"
+            << "regex: '" << params.regex_str << "'\n"
+            << "printed_message: '" << printed << "'\n";
+
+    std::cout.rdbuf(old_buf);
+}
+
+INSTANTIATE_TEST_SUITE_P(TIME_POINT,
+                         TimePointLogLevel,
+                         ::testing::Values(TimePointLogLevelValues{ "{:%H:%M:%S}", "\\d\\d:\\d\\d:\\d\\d.+\\n" },
+                                           TimePointLogLevelValues{
+                                                   "{:%d.%m.%Y %H:%M:%S}",
+                                                   "\\d\\d\\.\\d\\d\\.\\d\\d\\d\\d \\d\\d:\\d\\d:\\d\\d.+\\n" } ));
