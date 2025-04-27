@@ -291,3 +291,11 @@ INSTANTIATE_TEST_SUITE_P(TIME_POINT,
                                            TimePointLogValues{
                                                    "{:%d.%m.%Y %H:%M:%S}",
                                                    "\\d\\d\\.\\d\\d\\.\\d\\d\\d\\d \\d\\d:\\d\\d:\\d\\d.+\\n" }));
+
+
+TEST(LOG, PARAMS) {
+    cpt::log::set_level(cpt::log::Level::Info);
+    cpt::log::r_info("{}", 1);
+    cpt::log::r_info("{}", 1, "hi");
+    cpt::log::r_info("{0} {1} {0}", 1, "hi");
+}
