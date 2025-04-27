@@ -3,6 +3,7 @@ add_library(cpt-lib STATIC)
 target_sources(cpt-lib
                PRIVATE
                files.cpp
+               log.cpp
                strings.cpp
 
                PUBLIC FILE_SET HEADERS
@@ -11,6 +12,7 @@ target_sources(cpt-lib
                include/cpt/files.hpp
                include/cpt/files.hpp
                include/cpt/lib.hpp
+               include/cpt/log.hpp
                include/cpt/rect.hpp
                include/cpt/strings.hpp
                include/cpt/types.hpp
