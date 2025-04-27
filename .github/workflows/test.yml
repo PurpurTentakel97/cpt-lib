@@ -14,10 +14,10 @@
 name: cpt
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev ]
   workflow_dispatch: # started manually
   pull_request:
-    branches: [ main ] # PRs against the master branch
+    branches: [ main, dev ] # PRs against the master branch
 
 jobs:
   job:
@@ -99,6 +99,6 @@ jobs:
       - name: Show content of workspace at its completion
         run: find $RUNNER_WORKSPACE
         shell: bash
-        
+
       - name: Test Suite
         run: ctest --test-dir build
