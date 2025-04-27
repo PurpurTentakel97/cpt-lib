@@ -24,4 +24,9 @@ namespace cpt {
     void log::set_format(TimePointFormat const& format) {
         s_format = format;
     }
+
+    void log::flush() {
+        std::lock_guard lock{ s_mutex };
+        std::cout << std::flush;
+    }
 } // namespace cpt

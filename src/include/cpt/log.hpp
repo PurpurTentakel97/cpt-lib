@@ -67,6 +67,11 @@ namespace cpt {
         static void set_format(TimePointFormat const& format);
 
         /**
+         * calls std::flush.
+         */
+        static void flush();
+
+        /**
          *  if the logging level is set higher than 'critical' this logging gets ignored.
          *
          * @tparam Args Any datatype, that can be handled by 'std::vformat'
