@@ -19,6 +19,7 @@ struct BasicLogLevelValues final {
 class LogLevel : public testing::TestWithParam<BasicLogLevelValues> { };
 
 TEST_P(LogLevel, LOG_LEVEL_TRACE) {
+    // testing debug call
     auto const& params = GetParam();
 
     cpt::log::set_level(params.level);
@@ -44,6 +45,7 @@ TEST_P(LogLevel, LOG_LEVEL_TRACE) {
     EXPECT_EQ("", output_debug);
 #endif
 
+    // testing release call
     oss = std::ostringstream{};
     std::cout.rdbuf(oss.rdbuf());
 
@@ -219,7 +221,7 @@ INSTANTIATE_TEST_SUITE_P(LOG,
                                                       "" },
 
 
-                                 // error
+                                 // critical
                                  BasicLogLevelValues{ cpt::log::Level::Trace,
                                                       [] { cpt::log::critical("message"); },
                                                       [] { cpt::log::r_critical("message"); },

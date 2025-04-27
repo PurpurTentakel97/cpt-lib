@@ -3,7 +3,6 @@
 // 22.04.25
 //
 
-#include <chrono>
 #include <cpt/log.hpp>
 
 namespace cpt {
@@ -13,22 +12,15 @@ namespace cpt {
 
     std::string log::time() {
         try {
-            auto const now           = std::chrono::system_clock::now();
-            auto const local         = std::chrono::current_zone()->to_local(now);
+            auto const now                = std::chrono::system_clock::now();
+            auto const local              = std::chrono::current_zone()->to_local(now);
             auto const local_seconds = std::chrono::floor<std::chrono::seconds>(local);
-            return std::vformat(s_format, std::make_format_args(local_seconds));
+            return std::format(s_format, local_seconds);
 
-        } catch (std::format_error const& e) {
+        }
+        catch (std::bad_alloc const& e) {
             std::stringstream stream{};
-            stream << "Error while formatting timestamp: '" << s_format << "'\n"
-                   << "error: '" << e.what() << "'\n";
-            std::lock_guard lock{ s_mutex };
-            std::cerr << stream.str();
-            return "TIMESTAMP";
-
-        } catch (std::bad_alloc const& e) {
-            std::stringstream stream{};
-            stream << "bad alloc while printing timestamp: '" << s_format << "'\n"
+            stream << "bad alloc while printing timestamp: '" << s_format.get() << "'\n"
                    << "error: '" << e.what() << "'\n";
             std::lock_guard lock{ s_mutex };
             std::cerr << stream.str();
@@ -40,7 +32,7 @@ namespace cpt {
         s_level = level;
     }
 
-    void log::set_format(std::string const& format) {
+    void log::set_format(TimePointFormat const& format) {
         s_format = format;
     }
 } // namespace cpt
