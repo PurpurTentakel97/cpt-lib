@@ -4,7 +4,9 @@
 //
 
 
+#include <array>
 #include <cpt/log.hpp>
+#include <cpt/strings.hpp>
 #include <gtest/gtest-param-test.h>
 #include <gtest/gtest.h>
 #include <regex>
@@ -20,6 +22,7 @@ struct BasicLogLevelValues final {
 class LogLevel : public testing::TestWithParam<BasicLogLevelValues> { };
 
 TEST_P(LogLevel, LOG_LEVEL) {
+    cpt::log::clear();
     // testing debug call
     auto const& params = GetParam();
 
@@ -264,6 +267,7 @@ struct TimePointLogValues final {
 class TimePointLog : public testing::TestWithParam<TimePointLogValues> { };
 
 TEST_P(TimePointLog, TIME_POINT) {
+    cpt::log::clear();
     auto const& params = GetParam();
 
     std::ostringstream const oss{};
@@ -294,8 +298,60 @@ INSTANTIATE_TEST_SUITE_P(TIME_POINT,
 
 
 TEST(LOG, PARAMS) {
+    cpt::log::clear();
     cpt::log::set_level(cpt::log::Level::Info);
     cpt::log::r_info("{}", 1);
     cpt::log::r_info("{}", 1, "hi");
     cpt::log::r_info("{0} {1} {0}", 1, "hi");
 }
+
+struct DumpLogValues final {
+    cpt::log::Level dump_level;
+    int count;
+};
+
+class DumpLog : public testing::TestWithParam<DumpLogValues> { };
+
+TEST_P(DumpLog, DUMP) {
+
+    auto const expected = std::array<std::string, 6>{
+        "[trace]", "[debug]", "[Info]", "[Warn]", "[ERROR]", "[CRITICAL]",
+    };
+
+    cpt::log::clear();
+    cpt::log::set_level(cpt::log::Level::Info);
+
+    auto const& params = GetParam();
+
+    cpt::log::r_trace("message");
+    cpt::log::r_debug("message");
+    cpt::log::r_info("message");
+    cpt::log::r_warn("message");
+    cpt::log::r_error("message");
+    cpt::log::r_critical("message");
+
+    auto const dump = cpt::log::dump(params.dump_level);
+
+    auto const single_lines = cpt::split(dump, "\n", cpt::SplitBehavior::SkipEmptyParts);
+    auto const enum_index   = static_cast<int>(params.dump_level);
+
+    EXPECT_EQ(params.count, single_lines.size());
+
+    for (int i = 0; i < expected.size() - enum_index; ++i) {
+        auto const dump_entries = cpt::split(single_lines[i], " ", cpt::SplitBehavior::SkipEmptyParts);
+        auto const& ex_type     = expected[i + enum_index];
+        EXPECT_EQ(dump_entries[2], ex_type);
+        EXPECT_EQ(dump_entries[3], "message");
+    }
+}
+
+
+INSTANTIATE_TEST_SUITE_P(DUMP,
+                         DumpLog,
+                         ::testing::Values(DumpLogValues{ cpt::log::Level::Trace, 6 },
+                                           DumpLogValues{ cpt::log::Level::Debug, 5 },
+                                           DumpLogValues{ cpt::log::Level::Info, 4 },
+                                           DumpLogValues{ cpt::log::Level::Warn, 3 },
+                                           DumpLogValues{ cpt::log::Level::Error, 2 },
+                                           DumpLogValues{ cpt::log::Level::Critical, 1 },
+                                           DumpLogValues{ cpt::log::Level::None, 0 }));
