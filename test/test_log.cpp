@@ -7,6 +7,7 @@
 #include <array>
 #include <cpt/log.hpp>
 #include <cpt/strings.hpp>
+#include <cpt/types.hpp>
 #include <gtest/gtest-param-test.h>
 #include <gtest/gtest.h>
 #include <regex>
@@ -333,11 +334,11 @@ TEST_P(DumpLog, DUMP) {
     auto const dump = cpt::log::dump(params.dump_level);
 
     auto const single_lines = cpt::split(dump, "\n", cpt::SplitBehavior::SkipEmptyParts);
-    auto const enum_index   = static_cast<int>(params.dump_level);
+    auto const enum_index   = static_cast<cpt::usize>(params.dump_level);
 
     EXPECT_EQ(params.count, single_lines.size());
 
-    for (int i = 0; i < expected.size() - enum_index; ++i) {
+    for (cpt::usize i = 0; i < expected.size() - enum_index; ++i) {
         auto const dump_entries = cpt::split(single_lines[i], " ", cpt::SplitBehavior::SkipEmptyParts);
         auto const& ex_type     = expected[i + enum_index];
         EXPECT_EQ(dump_entries[2], ex_type);
