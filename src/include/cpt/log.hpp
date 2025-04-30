@@ -92,6 +92,10 @@ namespace cpt {
 
         [[nodiscard]] static std::string dump(Level level);
         static tl::expected<void, WriteFileError> save(Level level, std::filesystem::path const& path);
+        /**
+         * clears the current log map.
+         */
+        static void clear();
 
         /**
          *  if the logging level is set higher than 'critical' this logging gets ignored.

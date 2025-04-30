@@ -66,4 +66,7 @@ namespace cpt {
 
         return result;
     }
+    void log::clear() {
+        s_log.clear();
+    }
 } // namespace cpt
