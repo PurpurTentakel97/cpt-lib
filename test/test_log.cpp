@@ -355,3 +355,16 @@ INSTANTIATE_TEST_SUITE_P(DUMP,
                                            DumpLogValues{ cpt::log::Level::Error, 2 },
                                            DumpLogValues{ cpt::log::Level::Critical, 1 },
                                            DumpLogValues{ cpt::log::Level::None, 0 }));
+
+TEST(LOG, CLEAR) {
+    cpt::log::clear();
+    cpt::log::set_level(cpt::log::Level::Info);
+
+    cpt::log::r_info("message");
+    auto const dump = cpt::log::dump(cpt::log::Level::Info);
+    EXPECT_FALSE(dump.empty());
+
+    cpt::log::clear();
+    auto const dump_2 = cpt::log::dump(cpt::log::Level::Info);
+    EXPECT_TRUE(dump_2.empty());
+}
