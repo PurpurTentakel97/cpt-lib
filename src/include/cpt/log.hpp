@@ -90,7 +90,18 @@ namespace cpt {
          */
         static void flush();
 
+        /**
+         *
+         * @param level minimum level that gets dumped
+         * @return dump as string
+         */
         [[nodiscard]] static std::string dump(Level level);
+        /**
+         *
+         * @param level minimum level that gets dumped
+         * @param path relative or absolute path the pump gets saved to
+         * @return if the save was successful
+         */
         static tl::expected<void, WriteFileError> save(Level level, std::filesystem::path const& path);
         /**
          * clears the current log map.
