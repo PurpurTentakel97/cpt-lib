@@ -6,11 +6,19 @@
 #pragma once
 
 #include <chrono>
+#include <cpt/strings.hpp>
+#include <cpt/types.hpp>
+#include <filesystem>
 #include <format>
 #include <iostream>
 #include <mutex>
-#include <sstream>
 #include <string>
+#include <tl/expected.hpp>
+#include <vector>
+
+namespace cpt {
+    enum class WriteFileError;
+}
 
 namespace cpt {
     class log {
@@ -32,26 +40,49 @@ namespace cpt {
 
 
     private:
+        struct LogEntry final {
+            Level level;
+            std::string message;
+        };
+        static inline std::vector<LogEntry> s_log{};
         static inline std::mutex s_mutex{};
-        static inline auto s_level             = Level::Info;
-        static inline TimePointFormat s_format = "{:%H:%M:%S}";
-        static constexpr auto s_critical_str   = "[CRITICAL]";
-        static constexpr auto s_error_str      = "[ERROR]   ";
-        static constexpr auto s_warn_str       = "[Warn]    ";
-        static constexpr auto s_info_str       = "[Info]    ";
-        static constexpr auto s_debug_str      = "[debug]   ";
-        static constexpr auto s_trace_str      = "[trace]   ";
+        static inline auto s_level                        = Level::Info;
+        static constexpr TimePointFormat s_default_format = "{:%H:%M:%S}";
+        static constexpr usize s_default_new_line_offset  = 20;
+        static inline TimePointFormat s_format            = s_default_format;
+        static inline usize s_new_line_offset             = s_default_new_line_offset;
+        static constexpr auto s_critical_str              = "[CRITICAL]";
+        static constexpr auto s_error_str                 = "[ERROR]   ";
+        static constexpr auto s_warn_str                  = "[Warn]    ";
+        static constexpr auto s_info_str                  = "[Info]    ";
+        static constexpr auto s_debug_str                 = "[debug]   ";
+        static constexpr auto s_trace_str                 = "[trace]   ";
 
-        static bool should_print(Level level);
+        static bool should_log(Level current, Level provided);
 
-        static std::string time();
+        static std::string time(TimePointFormat const& format);
+        static void update_new_line_offset();
 
         template<typename... Args>
-        static void print(std::string const& level_text, std::format_string<Args...> const message, Args&&... args) {
-            auto const to_print =
-                    std::format("{} {} {}\n", time(), level_text, std::format(message, std::forward<Args>(args)...));
+        static void print(Level const level,
+                          std::string const& level_text,
+                          std::format_string<Args...> const message,
+                          Args&&... args) {
+            std::string const to_print = [&]() {
+                auto format = std::format(
+                        "{} {} {}", time(s_format), level_text, std::format(message, std::forward<Args>(args)...));
+                replace(format, "\n", "\n" + std::string(s_new_line_offset, ' '));
+                return format + '\n';
+            }();
+
+
             std::lock_guard lock{ s_mutex };
-            std::cout << to_print;
+
+            s_log.push_back({ level, to_print });
+
+            if (should_log(s_level, level)) {
+                std::cout << to_print;
+            }
         }
 
     public:
@@ -72,6 +103,29 @@ namespace cpt {
         static void flush();
 
         /**
+         *
+         * @param level minimum level that gets dumped
+         * @return dump as string
+         */
+        [[nodiscard]] static std::string dump(Level level);
+        /**
+         *
+         * @param level minimum level that gets dumped
+         * @param path relative or absolute path the pump gets saved to
+         * @return if the save was successful
+         */
+        static tl::expected<void, WriteFileError> save(Level level, std::filesystem::path const& path);
+
+        /**
+         * clears the current log map.
+         */
+        static void clear();
+        /**
+         * resets the format sting for the log timestamp.
+         */
+        static void reset_format();
+
+        /**
          *  if the logging level is set higher than 'critical' this logging gets ignored.
          *
          * @tparam Args Any datatype, that can be handled by 'std::vformat'
@@ -80,9 +134,7 @@ namespace cpt {
          */
         template<typename... Args>
         static void r_critical(MessageFormat<Args...> const& message, Args&&... args) {
-            if (should_print(Level::Critical)) {
-                print(s_critical_str, message, std::forward<Args>(args)...);
-            }
+            print(Level::Critical, s_critical_str, message, std::forward<Args>(args)...);
         }
         /**
          *  if the logging level is set higher than 'critical' this logging gets ignored.
@@ -108,9 +160,7 @@ namespace cpt {
          */
         template<typename... Args>
         static void r_error(MessageFormat<Args...> const& message, Args&&... args) {
-            if (should_print(Level::Error)) {
-                print(s_error_str, message, std::forward<Args>(args)...);
-            }
+            print(Level::Error, s_error_str, message, std::forward<Args>(args)...);
         }
         /**
          *  if the logging level is set higher than 'error' this logging gets ignored.
@@ -136,9 +186,7 @@ namespace cpt {
          */
         template<typename... Args>
         static void r_warn(MessageFormat<Args...> const& message, Args&&... args) {
-            if (should_print(Level::Warn)) {
-                print(s_warn_str, message, std::forward<Args>(args)...);
-            }
+            print(Level::Warn, s_warn_str, message, std::forward<Args>(args)...);
         }
         /**
          *  if the logging level is set higher than 'warn' this logging gets ignored.
@@ -164,9 +212,7 @@ namespace cpt {
          */
         template<typename... Args>
         static void r_info(MessageFormat<Args...> const& message, Args&&... args) {
-            if (should_print(Level::Info)) {
-                print(s_info_str, message, std::forward<Args>(args)...);
-            }
+            print(Level::Info, s_info_str, message, std::forward<Args>(args)...);
         }
         /**
          *  if the logging level is set higher than 'info' this logging gets ignored.
@@ -192,9 +238,7 @@ namespace cpt {
          */
         template<typename... Args>
         static void r_debug(MessageFormat<Args...> const& message, Args&&... args) {
-            if (should_print(Level::Debug)) {
-                print(s_debug_str, message, std::forward<Args>(args)...);
-            }
+            print(Level::Debug, s_debug_str, message, std::forward<Args>(args)...);
         }
         /**
          *  if the logging level is set higher than 'debug' this logging gets ignored.
@@ -220,9 +264,7 @@ namespace cpt {
          */
         template<typename... Args>
         static void r_trace(MessageFormat<Args...> const& message, Args&&... args) {
-            if (should_print(Level::Trace)) {
-                print(s_trace_str, message, std::forward<Args>(args)...);
-            }
+            print(Level::Trace, s_trace_str, message, std::forward<Args>(args)...);
         }
         /**
          *  if the logging level is set higher than 'trace' this logging gets ignored.

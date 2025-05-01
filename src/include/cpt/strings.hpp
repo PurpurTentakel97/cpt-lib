@@ -26,4 +26,6 @@ namespace cpt {
     [[nodiscard]] std::vector<std::string_view> split(std::string_view input,
                                                       std::string_view delimiter,
                                                       SplitBehavior split_behavior = SplitBehavior::KeepEmptyParts);
+
+    void replace(std::string& str, std::string_view old, std::string_view new_);
 } // namespace cpt

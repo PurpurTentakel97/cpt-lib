@@ -51,7 +51,7 @@ namespace cpt {
 
         constexpr Vec2& operator/=(T const& scalar) {
             if (scalar == T{}) {
-                throw BadVec2Argument("devision by 0");
+                throw BadVec2Argument("division by 0");
             }
             x /= scalar;
             y /= scalar;
