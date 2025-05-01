@@ -419,7 +419,7 @@ TEST(LOG, RESET_FORMAT) {
     cpt::log::r_info("message");
     auto const output_2 = oss.str();
     EXPECT_TRUE(std::regex_match(output_2, std::regex{ regex_str }))
-            << "unexpected timestamp format after reset (regex should match).\nexpected: {:%d.%m.%Y}\nprovided: "
+            << "unexpected timestamp format after reset (regex should match).\nexpected: {:%H:%M:%S}\nprovided: "
             << output_2;
 
     std::cout.rdbuf(old_buf);
