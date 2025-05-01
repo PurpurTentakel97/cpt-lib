@@ -79,4 +79,7 @@ namespace cpt {
     void log::clear() {
         s_log.clear();
     }
+    void log::reset_format() {
+        s_format = s_default_format;
+    }
 } // namespace cpt

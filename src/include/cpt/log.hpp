@@ -44,14 +44,15 @@ namespace cpt {
         };
         static inline std::vector<LogEntry> s_log{};
         static inline std::mutex s_mutex{};
-        static inline auto s_level             = Level::Info;
-        static inline TimePointFormat s_format = "{:%H:%M:%S}";
-        static constexpr auto s_critical_str   = "[CRITICAL]";
-        static constexpr auto s_error_str      = "[ERROR]   ";
-        static constexpr auto s_warn_str       = "[Warn]    ";
-        static constexpr auto s_info_str       = "[Info]    ";
-        static constexpr auto s_debug_str      = "[debug]   ";
-        static constexpr auto s_trace_str      = "[trace]   ";
+        static inline auto s_level                        = Level::Info;
+        static constexpr TimePointFormat s_default_format = "{:%H:%M:%S}";
+        static inline TimePointFormat s_format            = s_default_format;
+        static constexpr auto s_critical_str              = "[CRITICAL]";
+        static constexpr auto s_error_str                 = "[ERROR]   ";
+        static constexpr auto s_warn_str                  = "[Warn]    ";
+        static constexpr auto s_info_str                  = "[Info]    ";
+        static constexpr auto s_debug_str                 = "[debug]   ";
+        static constexpr auto s_trace_str                 = "[trace]   ";
 
         static bool should_log(Level current, Level provided);
 
@@ -62,8 +63,8 @@ namespace cpt {
                           std::string const& level_text,
                           std::format_string<Args...> const message,
                           Args&&... args) {
-            auto const to_print =
-                    std::format("{} {} {}\n", time(s_format), level_text, std::format(message, std::forward<Args>(args)...));
+            auto const to_print = std::format(
+                    "{} {} {}\n", time(s_format), level_text, std::format(message, std::forward<Args>(args)...));
             std::lock_guard lock{ s_mutex };
 
             s_log.push_back({ level, to_print });
@@ -103,10 +104,15 @@ namespace cpt {
          * @return if the save was successful
          */
         static tl::expected<void, WriteFileError> save(Level level, std::filesystem::path const& path);
+
         /**
          * clears the current log map.
          */
         static void clear();
+        /**
+         * resets the format sting for the log timestamp.
+         */
+        static void reset_format();
 
         /**
          *  if the logging level is set higher than 'critical' this logging gets ignored.
