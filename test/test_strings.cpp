@@ -14,45 +14,51 @@ TEST_P(TrimStringFictures, TRIM) {
     auto input        = std::get<0>(GetParam());
     auto const output = std::get<1>(GetParam());
     cpt::trim(input);
-    EXPECT_EQ(input, output);
+    EXPECT_EQ(input, output) << "unexpected result while trim:\nexpected: '" << output << "'\nprovided: '" << input
+                             << "'";
 }
 
 TEST_P(TrimStringFictures, LTRIM) {
     auto input        = std::get<0>(GetParam());
     auto const output = std::get<2>(GetParam());
     cpt::ltrim(input);
-    EXPECT_EQ(input, output);
+    EXPECT_EQ(input, output) << "unexpected result while ltrim:\nexpected: '" << output << "'\nprovided: '" << input
+                             << "'";
 }
 
 TEST_P(TrimStringFictures, RTRIM) {
     auto input        = std::get<0>(GetParam());
     auto const output = std::get<3>(GetParam());
     cpt::rtrim(input);
-    EXPECT_EQ(input, output);
+    EXPECT_EQ(input, output) << "unexpected result while rtrim:\nexpected: '" << output << "'\nprovided: '" << input
+                             << "'";
 }
 
 TEST_P(TrimStringFictures, TRIM_COPY) {
     auto const input  = std::get<0>(GetParam());
     auto const output = std::get<1>(GetParam());
     auto const result = cpt::trim_copy(input);
-    EXPECT_EQ(result, output);
-    EXPECT_EQ(std::get<0>(GetParam()), input);
+    EXPECT_EQ(result, output) << "unexpected result while copy_trim:\nexpected: '" << output << "'\nprovided: '"
+                              << input << "'";
+    EXPECT_EQ(std::get<0>(GetParam()), input) << "input was changed while trim_copy";
 }
 
 TEST_P(TrimStringFictures, LTRIM_COPY) {
     auto const input  = std::get<0>(GetParam());
     auto const output = std::get<2>(GetParam());
     auto const result = cpt::ltrim_copy(input);
-    EXPECT_EQ(result, output);
-    EXPECT_EQ(std::get<0>(GetParam()), input);
+    EXPECT_EQ(result, output) << "unexpected result while lcopy_trim:\nexpected: '" << output << "'\nprovided: '"
+                              << input << "'";
+    EXPECT_EQ(std::get<0>(GetParam()), input) << "input was changed while ltrim_copy";
 }
 
 TEST_P(TrimStringFictures, RTRIM_COPY) {
     auto const input  = std::get<0>(GetParam());
     auto const output = std::get<3>(GetParam());
     auto const result = cpt::rtrim_copy(input);
-    EXPECT_EQ(result, output);
-    EXPECT_EQ(std::get<0>(GetParam()), input);
+    EXPECT_EQ(result, output) << "unexpected result while rcopy_trim:\nexpected: '" << output << "'\nprovided: '"
+                              << input << "'";
+    EXPECT_EQ(std::get<0>(GetParam()), input) << "input was changed while rtrim_copy";
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -89,11 +95,13 @@ TEST_P(SplitStringFictures, SPLIT) {
     auto const output        = std::get<3>(GetParam());
     auto const result        = cpt::split(input, delimiter, empty_entries);
 
-    EXPECT_EQ(output.size(), result.size());
+    EXPECT_EQ(output.size(), result.size())
+            << "unexpect split count:\nexpected: " << output.size() << "\nprovided: " << result.size();
     for (std::size_t i = 0; i < output.size(); ++i) {
-        EXPECT_EQ(result[i], output[i]);
+        EXPECT_EQ(result[i], output[i]) << "unexpected line after splitting:\nexpected: 1" << output[i]
+                                        << "\nprovided: " << result[i];
     }
-    EXPECT_EQ(std::get<0>(GetParam()), input);
+    EXPECT_EQ(std::get<0>(GetParam()), input) << "input has changes after splitting";
 }
 
 INSTANTIATE_TEST_SUITE_P(STRINGS,
