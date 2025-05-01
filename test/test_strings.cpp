@@ -167,3 +167,31 @@ INSTANTIATE_TEST_SUITE_P(STRINGS,
                                                  ", ",
                                                  cpt::SplitBehavior::KeepEmptyParts,
                                                  std::vector<std::string>{ "", "test", "", "test", "test", "" })));
+
+
+struct ReplaceValues final {
+    std::string str;
+    std::string old;
+    std::string new_;
+    std::string expected;
+};
+
+class Replace : public testing::TestWithParam<ReplaceValues> { };
+
+TEST_P(Replace, REPLACE) {
+    auto params = GetParam();
+
+    cpt::replace(params.str, params.old, params.new_);
+    EXPECT_EQ(params.str, params.expected) << "unexpected replacement\nold: " << params.old << "\nnew: " << params.new_
+                                           << "\nexpected: " << params.expected << "\nprovided: " << params.str;
+}
+
+INSTANTIATE_TEST_SUITE_P(REPLACE,
+                         Replace,
+                         testing::Values(ReplaceValues{ "123456", "456", "123", "123123" },
+                                         ReplaceValues{ "123456", "123", "456", "456456" },
+                                         ReplaceValues{ "123123", "123", "456", "456456" },
+                                         ReplaceValues{ "123123", "1231", "4564", "456423" } ,
+                                         ReplaceValues{ "123456", "1", "2", "223456" },
+                                         ReplaceValues{ "123456", "123", "123456", "123456456" },
+                                         ReplaceValues{ "123456", "23456", "12", "112" }));
