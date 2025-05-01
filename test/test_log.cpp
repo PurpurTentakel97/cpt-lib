@@ -288,6 +288,7 @@ TEST_P(TimePointLog, TIME_POINT) {
             << "printed_message: '" << printed << "'\n";
 
     std::cout.rdbuf(old_buf);
+    cpt::log::reset_format();
 }
 
 INSTANTIATE_TEST_SUITE_P(TIME_POINT,
@@ -342,8 +343,8 @@ TEST_P(DumpLog, DUMP) {
     for (cpt::usize i = 0; i < expected.size() - enum_index; ++i) {
         auto const dump_entries = cpt::split(single_lines[i], " ", cpt::SplitBehavior::SkipEmptyParts);
         auto const& ex_type     = expected[i + enum_index];
-        EXPECT_EQ(dump_entries[2], ex_type) << "unexpected log type: expected: '" << ex_type << "'; provided: '" << dump_entries[2] << "'\n";
-        EXPECT_EQ(dump_entries[3], "message")<< "unexpected log message: expected: 'message'; provided: '" << dump_entries[2] << "\n";
+        EXPECT_EQ(dump_entries[1], ex_type) << "unexpected log type: expected: '" << ex_type << "'; provided: '" << dump_entries[1] << "'\n";
+        EXPECT_EQ(dump_entries[2], "message")<< "unexpected log message: expected: 'message'; provided: '" << dump_entries[2] << "\n";
     }
 }
 
