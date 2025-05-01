@@ -7,7 +7,7 @@ FetchContent_Declare(vcpkg
 )
 FetchContent_MakeAvailable(vcpkg)
 
-set(CMAKE_TOOLCHAIN_FILE "${vcpkg_SOURCE_DIR}/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "")
+set(CMAKE_TOOLCHAIN_FILE "${vcpkg_SOURCE_DIR}/scripts/buildsystems/vcpkg.cmake")
 project(cpt_lib)
 include(GNUInstallDirs)
 

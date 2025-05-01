@@ -1,6 +1,5 @@
 //
 // Purpur Tentakel
-// cpp 23
 // 25.05.24
 //
 
