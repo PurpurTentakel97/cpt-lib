@@ -64,4 +64,16 @@ namespace cpt {
 
         return output;
     }
+
+    void replace(std::string& str, std::string_view const old, std::string_view const new_) {
+        std::string::size_type lhs = 0;
+        while (lhs != std::string::npos) {
+            lhs = str.find(old, lhs);
+            if (lhs == std::string::npos) {
+                continue;
+            }
+            str.replace(lhs, old.size(), new_);
+            lhs += new_.size();
+        }
+    }
 } // namespace cpt
