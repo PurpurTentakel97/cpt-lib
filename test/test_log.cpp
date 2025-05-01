@@ -45,9 +45,12 @@ TEST_P(LogLevel, LOG_LEVEL) {
     }();
 
 #ifndef NDEBUG
-    EXPECT_EQ(params.result, output_debug);
+    EXPECT_EQ(params.result, output_debug)
+            << "unexpected output while debug build and debug function.\nexptected: " << params.result
+            << "\nprovided: " << output_debug;
 #else
-    EXPECT_EQ("", output_debug);
+    EXPECT_EQ("", output_debug) << "unexpected output while release build and debug function.\nexptected: "
+                                << params.result << "\nprovided: " << output_debug;
 #endif
 
     // testing release call
@@ -65,7 +68,9 @@ TEST_P(LogLevel, LOG_LEVEL) {
         return str;
     }();
 
-    EXPECT_EQ(params.result, output_release);
+    EXPECT_EQ(params.result, output_release)
+            << "unexpected output while release function.\nexptected: " << params.result
+            << "\nprovided: " << output_release;
 
     std::cout.rdbuf(old_buf);
 }
@@ -288,6 +293,7 @@ TEST_P(TimePointLog, TIME_POINT) {
             << "printed_message: '" << printed << "'\n";
 
     std::cout.rdbuf(old_buf);
+    cpt::log::reset_format();
 }
 
 INSTANTIATE_TEST_SUITE_P(TIME_POINT,
@@ -342,8 +348,10 @@ TEST_P(DumpLog, DUMP) {
     for (cpt::usize i = 0; i < expected.size() - enum_index; ++i) {
         auto const dump_entries = cpt::split(single_lines[i], " ", cpt::SplitBehavior::SkipEmptyParts);
         auto const& ex_type     = expected[i + enum_index];
-        EXPECT_EQ(dump_entries[2], ex_type) << "unexpected log type: expected: '" << ex_type << "'; provided: '" << dump_entries[2] << "'\n";
-        EXPECT_EQ(dump_entries[3], "message")<< "unexpected log message: expected: 'message'; provided: '" << dump_entries[2] << "\n";
+        EXPECT_EQ(dump_entries[1], ex_type)
+                << "unexpected log type: expected: '" << ex_type << "'; provided: '" << dump_entries[1] << "'\n";
+        EXPECT_EQ(dump_entries[2], "message")
+                << "unexpected log message: expected: 'message'; provided: '" << dump_entries[2] << "\n";
     }
 }
 
@@ -364,11 +372,11 @@ TEST(LOG, CLEAR) {
 
     cpt::log::r_info("message");
     auto const dump = cpt::log::dump(cpt::log::Level::Info);
-    EXPECT_FALSE(dump.empty());
+    EXPECT_FALSE(dump.empty()) << "dump empty after logging.";
 
     cpt::log::clear();
     auto const dump_2 = cpt::log::dump(cpt::log::Level::Info);
-    EXPECT_TRUE(dump_2.empty());
+    EXPECT_TRUE(dump_2.empty()) << "dump sill contains values after clear.";
 }
 
 
@@ -380,8 +388,8 @@ TEST(LOG, SAVE) {
     cpt::log::r_warn("message");
     cpt::log::r_critical("message");
 
-    auto const path = std::filesystem::temp_directory_path() / "cpt_log_test.txt";
+    auto const path   = std::filesystem::temp_directory_path() / "cpt_log_test.txt";
     auto const result = cpt::log::save(cpt::log::Level::Info, path);
 
-    EXPECT_TRUE(result.has_value());
+    EXPECT_TRUE(result.has_value()) << "error while saving dump";
 }

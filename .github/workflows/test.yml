@@ -101,4 +101,4 @@ jobs:
         shell: bash
 
       - name: Test Suite
-        run: ctest --test-dir build
+        run: ctest --test-dir build --output-on-failure
