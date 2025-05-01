@@ -380,7 +380,7 @@ TEST(LOG, SAVE) {
     cpt::log::r_warn("message");
     cpt::log::r_critical("message");
 
-    auto const path = std::filesystem::temp_directory_path() / "cpt_log_test.txt";
+    auto const path   = std::filesystem::temp_directory_path() / "cpt_log_test.txt";
     auto const result = cpt::log::save(cpt::log::Level::Info, path);
 
     EXPECT_TRUE(result.has_value());
