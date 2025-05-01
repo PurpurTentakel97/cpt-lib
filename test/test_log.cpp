@@ -336,13 +336,14 @@ TEST_P(DumpLog, DUMP) {
     auto const single_lines = cpt::split(dump, "\n", cpt::SplitBehavior::SkipEmptyParts);
     auto const enum_index   = static_cast<cpt::usize>(params.dump_level);
 
-    EXPECT_EQ(params.count, single_lines.size());
+    EXPECT_EQ(params.count, single_lines.size())
+            << "unexpected line count: expected: '" << params.count << "'; provided: '" << single_lines.size() << "'\n";
 
     for (cpt::usize i = 0; i < expected.size() - enum_index; ++i) {
         auto const dump_entries = cpt::split(single_lines[i], " ", cpt::SplitBehavior::SkipEmptyParts);
         auto const& ex_type     = expected[i + enum_index];
-        EXPECT_EQ(dump_entries[2], ex_type);
-        EXPECT_EQ(dump_entries[3], "message");
+        EXPECT_EQ(dump_entries[2], ex_type) << "unexpected log type: expected: '" << ex_type << "'; provided: '" << dump_entries[2] << "'\n";
+        EXPECT_EQ(dump_entries[3], "message")<< "unexpected log message: expected: 'message'; provided: '" << dump_entries[2] << "\n";
     }
 }
 
