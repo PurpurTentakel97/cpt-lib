@@ -6,6 +6,8 @@
 #pragma once
 
 #include <chrono>
+#include <cpt/strings.hpp>
+#include <cpt/types.hpp>
 #include <filesystem>
 #include <format>
 #include <iostream>
@@ -46,7 +48,9 @@ namespace cpt {
         static inline std::mutex s_mutex{};
         static inline auto s_level                        = Level::Info;
         static constexpr TimePointFormat s_default_format = "{:%H:%M:%S}";
+        static constexpr usize s_default_new_line_offset  = 20;
         static inline TimePointFormat s_format            = s_default_format;
+        static inline usize s_new_line_offset             = s_default_new_line_offset;
         static constexpr auto s_critical_str              = "[CRITICAL]";
         static constexpr auto s_error_str                 = "[ERROR]   ";
         static constexpr auto s_warn_str                  = "[Warn]    ";
@@ -57,14 +61,21 @@ namespace cpt {
         static bool should_log(Level current, Level provided);
 
         static std::string time(TimePointFormat const& format);
+        static void update_new_line_offset();
 
         template<typename... Args>
         static void print(Level const level,
                           std::string const& level_text,
                           std::format_string<Args...> const message,
                           Args&&... args) {
-            auto const to_print = std::format(
-                    "{} {} {}\n", time(s_format), level_text, std::format(message, std::forward<Args>(args)...));
+            std::string const to_print = [&]() {
+                auto format = std::format(
+                        "{} {} {}", time(s_format), level_text, std::format(message, std::forward<Args>(args)...));
+                replace(format, "\n", "\n" + std::string(s_new_line_offset, ' '));
+                return format + '\n';
+            }();
+
+
             std::lock_guard lock{ s_mutex };
 
             s_log.push_back({ level, to_print });

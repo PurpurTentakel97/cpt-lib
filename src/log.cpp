@@ -18,12 +18,17 @@ namespace cpt {
         return std::format(format, local_seconds);
     }
 
+    void log::update_new_line_offset() {
+        s_new_line_offset = time(s_format).length() + 12; // 12 is the length of any log type
+    }
+
     void log::set_level(Level const level) {
         s_level = level;
     }
 
     void log::set_format(TimePointFormat const& format) {
         s_format = format;
+        update_new_line_offset();
     }
 
     void log::flush() {
@@ -49,7 +54,8 @@ namespace cpt {
         auto const path = [&provided_path]() {
             auto const time_str = time("{:%Y_%m_%d__%H_%M_%S}");
 
-            auto const file = std::format("{}_{}{}", provided_path.stem().string(), time_str, provided_path.extension().string());
+            auto const file =
+                    std::format("{}_{}{}", provided_path.stem().string(), time_str, provided_path.extension().string());
             return provided_path.parent_path() / file;
         }();
 
@@ -81,5 +87,6 @@ namespace cpt {
     }
     void log::reset_format() {
         s_format = s_default_format;
+        update_new_line_offset();
     }
 } // namespace cpt
