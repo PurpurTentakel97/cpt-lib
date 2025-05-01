@@ -55,7 +55,7 @@ namespace cpt {
 
         static bool should_log(Level current, Level provided);
 
-        static std::string time();
+        static std::string time(TimePointFormat const& format);
 
         template<typename... Args>
         static void print(Level const level,
@@ -63,7 +63,7 @@ namespace cpt {
                           std::format_string<Args...> const message,
                           Args&&... args) {
             auto const to_print =
-                    std::format("{} {} {}\n", time(), level_text, std::format(message, std::forward<Args>(args)...));
+                    std::format("{} {} {}\n", time(s_format), level_text, std::format(message, std::forward<Args>(args)...));
             std::lock_guard lock{ s_mutex };
 
             s_log.push_back({ level, to_print });

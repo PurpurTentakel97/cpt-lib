@@ -11,11 +11,11 @@ namespace cpt {
         return provided >= current;
     }
 
-    std::string log::time() {
+    std::string log::time(TimePointFormat const& format) {
         auto const now           = std::chrono::system_clock::now();
         auto const local         = std::chrono::current_zone()->to_local(now);
         auto const local_seconds = std::chrono::floor<std::chrono::seconds>(local);
-        return std::format(s_format, local_seconds);
+        return std::format(format, local_seconds);
     }
 
     void log::set_level(Level const level) {
@@ -45,22 +45,32 @@ namespace cpt {
         return to_return;
     }
 
-    tl::expected<void, WriteFileError> log::save(Level const level, std::filesystem::path const& path) {
-        auto const result = cpt::write_file(path, dump(level));
-        if (!result.has_value()) {
-            switch (result.error()) {
-                case WriteFileError::OpenFile: {
-                    r_critical("unable to open logfile: {}", path.string());
-                    break;
-                }
-                case WriteFileError::WriteToFile: {
-                    r_critical("unable to write to logfile: {}", path.string());
-                    break;
-                }
-                default: {
-                    r_critical("unexpected error while saving log to: {}", path.string());
-                    break;
-                }
+    tl::expected<void, WriteFileError> log::save(Level const level, std::filesystem::path const& provided_path) {
+        auto const path = [&provided_path]() {
+            auto const time_str = time("{:%Y_%m_%d__%H_%M_%S}");
+
+            auto const file = std::format("{}_{}{}", provided_path.stem().string(), time_str, provided_path.extension().string());
+            return provided_path.parent_path() / file;
+        }();
+
+        auto const result = write_file(path, dump(level));
+
+        if (result.has_value()) {
+            return result;
+        }
+
+        switch (result.error()) {
+            case WriteFileError::OpenFile: {
+                r_critical("unable to open logfile: {}", std::filesystem::absolute(path).string());
+                break;
+            }
+            case WriteFileError::WriteToFile: {
+                r_critical("unable to write to logfile: {}", std::filesystem::absolute(path).string());
+                break;
+            }
+            default: {
+                r_critical("unexpected error while saving log to: {}", std::filesystem::absolute(path).string());
+                break;
             }
         }
 
