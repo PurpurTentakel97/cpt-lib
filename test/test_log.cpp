@@ -393,3 +393,34 @@ TEST(LOG, SAVE) {
 
     EXPECT_TRUE(result.has_value()) << "error while saving dump";
 }
+
+TEST(LOG, RESET_FORMAT) {
+    auto constexpr regex_str = "\\d\\d:\\d\\d:\\d\\d.+\\n";
+    cpt::log::clear();
+    cpt::log::set_level(cpt::log::Level::Info);
+
+    std::ostringstream oss{};
+    auto* old_buf = std::cout.rdbuf();
+    std::cout.rdbuf(oss.rdbuf());
+
+
+    cpt::log::set_format("{:%d.%m.%Y %H:%M:%S}");
+    cpt::log::r_info("message");
+    auto const output_1 = oss.str();
+    EXPECT_FALSE(std::regex_match(output_1, std::regex{ regex_str }))
+            << "unexpected timestamp format before reset (regex should not match).\nexpected: {:%d.%m.%Y "
+               "%H:%M:%S}\nprovided: "
+            << output_1;
+
+    oss = std::ostringstream{};
+    std::cout.rdbuf(oss.rdbuf());
+
+    cpt::log::reset_format();
+    cpt::log::r_info("message");
+    auto const output_2 = oss.str();
+    EXPECT_TRUE(std::regex_match(output_2, std::regex{ regex_str }))
+            << "unexpected timestamp format after reset (regex should match).\nexpected: {:%d.%m.%Y}\nprovided: "
+            << output_2;
+
+    std::cout.rdbuf(old_buf);
+}
