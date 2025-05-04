@@ -20,85 +20,82 @@ on:
     branches: [ main, dev ] # PRs against the master branch
 
 jobs:
-  job:
-    name: ${{ matrix.build }}-${{ matrix.os }}-${{ github.workflow }}
-    runs-on: ${{ matrix.os }}
+  linux:
+    name: ${{ matrix.build }}-ubuntu-${{matrix.compiler}}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest ]
+        compiler: [ gcc, clang ]
         build: [ Release, Debug ]
         include:
-          - os: windows-latest
-            triplet: x64-windows
-            preset: ninja-multi-vcpkg
           - os: ubuntu-latest
-            triplet: x64-linux
-            preset: ninja
-    env:
-      # Tells vcpkg where binary packages are stored.
-      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
+            compiler: gcc
+            cc-path: /usr/bin/gcc-13
+            cxx-path: /usr/bin/g++-13
+            install-script: |
+              sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+              sudo apt-get update
+              sudo apt-get install -y gcc-13 g++-13
+          - os: ubuntu-latest
+            compiler: clang
+            cc-path: /usr/bin/clang-20
+            cxx-path: /usr/bin/clang++-20
+            install-script: |
+              wget https://apt.llvm.org/llvm.sh
+              chmod +x llvm.sh
+              sudo ./llvm.sh 20
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          fetch-depth: 0
-      - name: "Create directory '${{ env.VCPKG_DEFAULT_BINARY_CACHE }}'"
-        run: mkdir -p $VCPKG_DEFAULT_BINARY_CACHE
-        shell: bash
 
-      # Setup the build machine with the most recent versions of CMake and Ninja. Both are cached if not already: on subsequent runs both will be quickly restored from GitHub cache service.
-      - uses: lukka/get-cmake@latest
+      - name: Install Compiler ${{matrix.compiler}}
+        run: ${{matrix.install-script}}
 
-      # Restore both vcpkg and its artifacts from the GitHub cache service.
-      - name: Restore vcpkg and its artifacts.
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          # The key is composed in a way that it gets properly invalidated: this must happen whenever vcpkg's Git commit id changes, or the list of packages changes. In this case a cache miss must happen and a new entry with a new key with be pushed to GitHub the cache service.
-          # The key includes: hash of the vcpkg.json file, the hash of the vcpkg Git commit id, and the used vcpkg's triplet. The vcpkg's commit id would suffice, but computing an hash out it does not harm.
-          # Note: given a key, the cache content is immutable. If a cache entry has been created improperly, in order the recreate the right content the key must be changed as well, and it must be brand new (i.e. not existing already).
-          key: |
-            ${{ hashFiles( 'vcpkg.json' ) }}-${{ matrix.triplet }}
-
-      - name: Show content of workspace after cache has been restored
-        run: find $RUNNER_WORKSPACE
-        shell: bash
-
-      # On Windows runners, let's ensure to have the Developer Command Prompt environment setup correctly. As used here the Developer Command Prompt created is targeting x64 and using the default the Windows SDK.
-      - uses: ilammy/msvc-dev-cmd@v1
-
-      - name: Install GCC 13
+      - name: Conficure CMake
         run: |
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-          sudo apt-get update
-          sudo apt-get install -y gcc-13 g++-13
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 100
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-
-      # Run CMake to generate Ninja project files, using the vcpkg's toolchain file to resolve and install the dependencies as specified in vcpkg.json.
-      - name: Install dependencies and generate project files
-        run: |
-          cmake -S . -B build -G "Ninja" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} -DCMAKE_INSTALL_PREFIX=INSTALL
-        working-directory: "${{ github.workspace }}"
+          sudo update-alternatives --install /usr/bin/cc cc /usr/bin/${{ matrix.cc }} 100
+          sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/${{ matrix.cxx }} 100
+          cmake -B build -G "Unix Makefiles" \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build }} 
 
       # Build the whole project with Ninja (which is spawn by CMake).
-      - name: Build ${{matrix.os}} / ${{matrix.build}}
-        run: |
-          cmake --build build --config ${{matrix.build}}
-        working-directory: "${{ github.workspace }}"
+      - name: Build
+        run: cmake --build build -j 10
 
       # install the whole project
-      - name: Install ${{matrix.os}} / ${{matrix.build}}
-        run: |
-          cmake --install build
-        working-directory: "${{ github.workspace }}"
-
-      - name: Show content of workspace at its completion
-        run: find $RUNNER_WORKSPACE
-        shell: bash
+      - name: Install
+        run: cmake --install build --prefix INSTALL
 
       - name: Test Suite
         run: ctest --test-dir build --output-on-failure
+
+
+  windows:
+    name: ${{ matrix.build }}-windows-msvc
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build: [ Release, Debug ]
+
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Ninja
+        run: choco install ninja
+      - name: Install CMake
+        run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
+      - name: Set up Visual Studio Environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Configure CMake with Ninja and C++23
+        run: cmake -B build -G "Ninja" -DCMAKE_CXX_STANDARD=23 -DCMAKE_BUILD_TYPE=${{ matrix.build }}
+      - name: Build with Ninja
+        run: cmake --build build -j 10
+      - name: Install
+        run: cmake --install build --prefix INSTALL
+      - name: Run Tests
+        run: ctest --test-dir build --verbose --output-on-failure
