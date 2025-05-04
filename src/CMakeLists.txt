@@ -1,6 +1,6 @@
-add_library(cpt-lib STATIC)
+add_library(cpt__cpt_lib STATIC)
 
-target_sources(cpt-lib
+target_sources(cpt__cpt_lib
                PRIVATE
                files.cpp
                log.cpp
@@ -20,12 +20,12 @@ target_sources(cpt-lib
                include/cpt/vec2.hpp
 )
 
-target_include_directories(cpt-lib
+target_include_directories(cpt__cpt_lib
                            PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                            PUBLIC $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(cpt-lib
+target_link_libraries(cpt__cpt_lib
                       PUBLIC
                       tl::expected
                       tl::optional

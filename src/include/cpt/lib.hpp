@@ -8,6 +8,7 @@
 
 #include <cpt/concepts.hpp>
 #include <cpt/files.hpp>
+#include <cpt/log.hpp>
 #include <cpt/rect.hpp>
 #include <cpt/strings.hpp>
 #include <cpt/types.hpp>
