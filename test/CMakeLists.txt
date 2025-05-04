@@ -1,4 +1,4 @@
-add_executable(lib_test
+add_executable(cpt__cpt_lib_test
                test_concepts.cpp
                test_files.cpp
                test_log.cpp
@@ -8,12 +8,12 @@ add_executable(lib_test
                test_vec2.cpp
 )
 
-target_link_libraries(lib_test
+target_link_libraries(cpt__cpt_lib_test
                       PRIVATE
                       cpt_lib_project_options
-                      cpt-lib
+                      cpt__cpt_lib
                       GTest::gtest_main
 )
 
 include(GoogleTest)
-gtest_discover_tests(lib_test)
+gtest_discover_tests(cpt__cpt_lib_test)
