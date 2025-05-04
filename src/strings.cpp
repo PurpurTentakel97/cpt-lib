@@ -35,14 +35,13 @@ namespace cpt {
 
     void ltrim(std::string& input) {
         input.erase(input.begin(), std::ranges::find_if(input, [](auto const c) {
-                        return !std::isspace(static_cast<unsigned int>(c));
+                        return !std::isspace(static_cast<unsigned char>(c));
                     }));
     }
-
     void rtrim(std::string& input) {
         input.erase(std::find_if(input.rbegin(),
                                  input.rend(),
-                                 [](auto const c) { return !std::isspace(static_cast<unsigned int>(c)); })
+                                 [](auto const c) { return !std::isspace(static_cast<unsigned char>(c)); })
                             .base(),
                     input.end());
     }
