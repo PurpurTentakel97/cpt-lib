@@ -61,7 +61,7 @@ jobs:
 
       # Build the whole project with Ninja (which is spawn by CMake).
       - name: Build
-        run: cmake --build build
+        run: cmake --build build -j 10
 
       # install the whole project
       - name: Install
@@ -69,3 +69,33 @@ jobs:
 
       - name: Test Suite
         run: ctest --test-dir build --output-on-failure
+
+
+  windows:
+    name: ${{ matrix.build }}-windows-msvc
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build: [ Release, Debug ]
+
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Ninja
+        run: choco install ninja
+      - name: Install CMake
+        run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
+      - name: Set up Visual Studio Environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Configure CMake with Ninja and C++23
+        run: cmake -B build -G "Ninja" -DCMAKE_CXX_STANDARD=23 -DCMAKE_BUILD_TYPE=${{ matrix.build }}
+      - name: Build with Ninja
+        run: cmake --build build -j 10
+      - name: Install
+        run: cmake --install build --prefix INSTALL
+      - name: Run Tests
+        run: ctest --test-dir build --verbose --output-on-failure
