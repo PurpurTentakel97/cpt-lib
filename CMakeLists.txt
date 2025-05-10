@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(${PROJECT_SOURCE_DIR}/cmake/project_options.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/SystemLink.cmake)
 add_subdirectory(external)
 add_subdirectory(src bin)
 
