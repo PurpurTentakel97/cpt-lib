@@ -77,12 +77,13 @@ jobs:
       - name: Install Compiler ${{matrix.compiler}}
         run: ${{matrix.install-script}}
 
-      - name: Conficure CMake
+      - name: Configure CMake
         run: |
           sudo update-alternatives --install /usr/bin/cc cc /usr/bin/${{ matrix.cc }} 100
           sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/${{ matrix.cxx }} 100
           cmake -B build -G "Unix Makefiles" \
-            -DCMAKE_BUILD_TYPE=${{ matrix.build }} 
+            -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
+            -Dcpt__cpt_lib_use_vcpkg:BOOL=ON
 
       # Build the whole project with Ninja (which is spawn by CMake).
       - name: Build
@@ -141,8 +142,8 @@ jobs:
         with:
           arch: x64
 
-      - name: Configure CMake with Ninja and C++23
-        run: cmake -B build -G "Ninja" -DCMAKE_CXX_STANDARD=23 -DCMAKE_BUILD_TYPE=${{ matrix.build }}
+      - name: Configure CMake with Ninja
+        run: cmake -B build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ matrix.build }} -Dcpt__cpt_lib_use_vcpkg:BOOL=ON
       - name: Build with Ninja
         run: cmake --build build -j 10
       - name: Install
