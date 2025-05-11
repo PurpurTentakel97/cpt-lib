@@ -25,10 +25,10 @@ target_include_directories(cpt__cpt_lib
                            PUBLIC $<INSTALL_INTERFACE:include>
 )
 
+target_link_system_libraries(cpt__cpt_lib
+                             PUBLIC
+                             tl::expected
+                             tl::optional)
 target_link_libraries(cpt__cpt_lib
-                      PUBLIC
-                      tl::expected
-                      tl::optional
-                      PRIVATE
-                      $<BUILD_INTERFACE:cpt_lib_project_options>
+                      PRIVATE $<BUILD_INTERFACE:cpt_lib_project_options>
 )
