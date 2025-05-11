@@ -8,12 +8,9 @@ add_executable(cpt__cpt_lib_test
                test_vec2.cpp
 )
 
-target_link_system_libraries(cpt__cpt_lib_test
-                             PRIVATE
-                             GTest::gtest_main
-)
 target_link_libraries(cpt__cpt_lib_test
                       PRIVATE
+                      GTest::gtest_main
                       cpt_lib_project_options
                       cpt__cpt_lib
 )
