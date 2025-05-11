@@ -46,8 +46,33 @@ jobs:
               chmod +x llvm.sh
               sudo ./llvm.sh 20
 
+    env:
+      # Set vcpkg cache directories
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
+      X_VCPKG_REGISTRIES_CACHE: ${{ github.workspace }}/vcpkg_registry_cache
+
     steps:
       - uses: actions/checkout@v3
+
+      - name: "Create vcpkg cache directories '${{ env.VCPKG_DEFAULT_BINARY_CACHE }}' and '${{ env.X_VCPKG_REGISTRIES_CACHE }}'"
+        shell: bash
+        run: |
+          mkdir -p $VCPKG_DEFAULT_BINARY_CACHE
+          mkdir -p $X_VCPKG_REGISTRIES_CACHE
+
+      - name: Restore vcpkg cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+            ${{ env.X_VCPKG_REGISTRIES_CACHE }}
+          # The key is composed in a way that it gets properly invalidated: this must happen whenever vcpkg.json changes.
+          # In this case a cache miss must happen and a new entry with a new key with be pushed to GitHub the cache service.
+          # The key includes: hash of the vcpkg.json file and the used vcpkg's triplet.
+          # Note: given a key, the cache content is immutable. If a cache entry has been created improperly,
+          # in order the recreate the right content the key must be changed as well, and it must be brand new (i.e. not existing already).
+          key: |
+            ${{ hashFiles( 'vcpkg.json' ) }}-x64-linux
 
       - name: Install Compiler ${{matrix.compiler}}
         run: ${{matrix.install-script}}
@@ -79,9 +104,34 @@ jobs:
       matrix:
         build: [ Release, Debug ]
 
+    env:
+      # Set vcpkg cache directories
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
+      X_VCPKG_REGISTRIES_CACHE: ${{ github.workspace }}/vcpkg_registry_cache
 
     steps:
       - uses: actions/checkout@v3
+
+      - name: "Create vcpkg cache directories '${{ env.VCPKG_DEFAULT_BINARY_CACHE }}' and '${{ env.X_VCPKG_REGISTRIES_CACHE }}'"
+        shell: bash
+        run: |
+          mkdir -p $VCPKG_DEFAULT_BINARY_CACHE
+          mkdir -p $X_VCPKG_REGISTRIES_CACHE
+
+      - name: Restore vcpkg cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+            ${{ env.X_VCPKG_REGISTRIES_CACHE }}
+          # The key is composed in a way that it gets properly invalidated: this must happen whenever vcpkg.json changes.
+          # In this case a cache miss must happen and a new entry with a new key with be pushed to GitHub the cache service.
+          # The key includes: hash of the vcpkg.json file and the used vcpkg's triplet.
+          # Note: given a key, the cache content is immutable. If a cache entry has been created improperly,
+          # in order the recreate the right content the key must be changed as well, and it must be brand new (i.e. not existing already).
+          key: |
+            ${{ hashFiles( 'vcpkg.json' ) }}-x64-windows
+
       - name: Install Ninja
         run: choco install ninja
       - name: Install CMake
