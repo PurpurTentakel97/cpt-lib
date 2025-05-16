@@ -24,4 +24,6 @@ namespace cpt {
 
     [[nodiscard]] tl::expected<void, WriteFileError> write_file(std::filesystem::path const& path,
                                                                 std::string_view contents);
+
+    [[nodiscard]] std::filesystem::path make_absolute_path(std::filesystem::path const& path);
 } // namespace cpt
