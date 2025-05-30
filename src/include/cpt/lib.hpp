@@ -6,7 +6,9 @@
 
 #pragma once
 
+#include <cpt/callback.hpp>
 #include <cpt/concepts.hpp>
+#include <cpt/exception.hpp>
 #include <cpt/files.hpp>
 #include <cpt/log.hpp>
 #include <cpt/rect.hpp>
