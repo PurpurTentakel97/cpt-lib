@@ -1,5 +1,6 @@
 add_executable(cpt__cpt_lib_test
                test_callback.cpp
+               test_channel.cpp
                test_concepts.cpp
                test_files.cpp
                test_log.cpp
