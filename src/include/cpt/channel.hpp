@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <memory>
 #include <mutex>
 #include <queue>
 #include <tl/optional.hpp>
@@ -19,19 +20,31 @@ namespace cpt {
 
 namespace cpt {
     template<typename T>
-    class ChannelQueue final {
+    class Channel final {
+    private:
+        class ChannelKeyPass { };
+
     public:
         friend class Sender<T>;
         friend class Receiver<T>;
+
+        explicit Channel(ChannelKeyPass const&) { };
+
+        [[nodiscard]] static std::pair<Sender<T>, Receiver<T>> create() {
+            // The order here is important since the queue is moved into the receiver. It would be a use after move then.
+            auto queue    = std::make_shared<Channel>(ChannelKeyPass{});
+            auto sender   = Sender<T>{ queue };
+            auto receiver = Receiver<T>{ std::move(queue) };
+            return { std::move(sender), std::move(receiver) };
+        }
 
     private:
         std::queue<T> m_buffer{};
         std::mutex m_mutex{};
 
-        template<std::convertible_to<T> U>
-        void push(U&& value) {
+        void push(T value) {
             auto const lock = std::lock_guard{ m_mutex };
-            m_buffer.push(std::forward<U>(value));
+            m_buffer.push(std::move(value));
         }
 
         [[nodiscard]] tl::optional<T> pop() {
@@ -45,43 +58,42 @@ namespace cpt {
             m_buffer.pop();
             return { std::move(value) };
         }
-    };
+    }; // namespace detail
 
     template<typename T>
     class Sender final {
-        std::shared_ptr<ChannelQueue<T>> m_queue;
+        std::shared_ptr<Channel<T>> m_queue;
 
     public:
-        template<std::convertible_to<T> U>
-        void send(U&& value) {
-            m_queue->push(std::forward<U>(value));
+        explicit Sender(std::shared_ptr<Channel<T>> queue) : m_queue{ std::move(queue) } { }
+
+        void send(T value) const {
+            m_queue->push(std::move(value));
         }
 
         [[nodiscard]] Sender clone() const {
-            return { m_queue };
+            return Sender{ m_queue };
         }
     };
 
     template<typename T>
     class Receiver final {
-        std::shared_ptr<ChannelQueue<T>> m_queue;
+        std::shared_ptr<Channel<T>> m_queue;
 
     public:
-        [[nodiscard]] tl::optional<T> receive() {
+        explicit Receiver(std::shared_ptr<Channel<T>> queue) : m_queue{ std::move(queue) } { }
+
+        [[nodiscard]] tl::optional<T> receive() const {
             return m_queue->pop();
         }
 
         [[nodiscard]] Receiver clone() const {
-            return { m_queue };
+            return Receiver{ m_queue };
         }
     };
 
     template<typename T>
     std::pair<Sender<T>, Receiver<T>> channel() {
-        // The order here is important since the queue is moved into the receiver. It would be a use after move then.
-        auto queue    = std::make_shared<ChannelQueue<T>>();
-        auto sender   = Sender<T>{ queue };
-        auto receiver = Receiver<T>{ std::move(queue) };
-        return { std::move(sender), std::move(receiver) };
+        return Channel<T>::create();
     }
 } // namespace cpt
