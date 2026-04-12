@@ -7,6 +7,7 @@
 #pragma once
 
 #include <cpt/callback.hpp>
+#include <cpt/channel.hpp>
 #include <cpt/concepts.hpp>
 #include <cpt/exception.hpp>
 #include <cpt/files.hpp>

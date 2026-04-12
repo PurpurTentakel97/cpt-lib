@@ -9,6 +9,7 @@ target_sources(cpt__cpt_lib
                PUBLIC FILE_SET HEADERS
                BASE_DIRS include FILES
                include/cpt/callback.hpp
+               include/cpt/channel.hpp
                include/cpt/concepts.hpp
                include/cpt/exception.hpp
                include/cpt/files.hpp
