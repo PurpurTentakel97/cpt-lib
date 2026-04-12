@@ -15,7 +15,7 @@ TEST(Channel, NotDefaultConstructible) {
 }
 
 TEST(Channel, Create) {
-    [[maybe_unused]] auto [sender, receiver] = cpt::channel<int>();
+    [[maybe_unused]] auto [sender, receiver]   = cpt::channel<int>();
     [[maybe_unused]] auto [sender2, receiver2] = cpt::Channel<int>::create();
 }
 
@@ -143,9 +143,8 @@ TEST(Channel, MultithreadedSendReceive) {
         ++received_count;
     }
 
-    EXPECT_EQ(received_count, message_count)
-            << "unexpected number of received messages.\nexpected: " << message_count
-            << "\nprovided: " << received_count;
+    EXPECT_EQ(received_count, message_count) << "unexpected number of received messages.\nexpected: " << message_count
+                                             << "\nprovided: " << received_count;
 }
 
 TEST(Channel, MultithreadedMultipleSenders) {
@@ -230,4 +229,22 @@ TEST(Channel, ShouldTerminateSafe) {
 
     [[maybe_unused]] auto const __ = receiver2.receive();
     EXPECT_TRUE(receiver2.should_terminate_safe()); // no more pending messages
+}
+
+TEST(Channel, ConstSender) {
+    auto const [sender, receiver] = cpt::channel<int>();
+    sender.send(1);
+    sender.send_safe(2);
+    [[maybe_unused]] auto const value = sender.clone();
+    sender.terminate();
+    [[maybe_unused]] auto const value2 = sender.is_terminating();
+}
+
+TEST(Channel, ConstReceiver) {
+    auto const [sender, receiver] = cpt::channel<int>();
+    [[maybe_unused]] auto const value = receiver.receive();
+    [[maybe_unused]] auto const value2 = receiver.clone();
+    [[maybe_unused]] auto const value3 = receiver.should_terminate_safe();
+    [[maybe_unused]] auto const value4 = receiver.should_terminate();
+    [[maybe_unused]] auto const value5 = receiver.has_pending_messages();
 }
