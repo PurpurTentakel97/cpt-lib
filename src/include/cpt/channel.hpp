@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -41,6 +42,7 @@ namespace cpt {
     private:
         std::queue<T> m_buffer{};
         std::mutex m_mutex{};
+        std::atomic_bool m_terminated{ false };
 
         void push(T value) {
             auto const lock = std::lock_guard{ m_mutex };
@@ -71,8 +73,24 @@ namespace cpt {
             m_queue->push(std::move(value));
         }
 
+        void send_safe(T value) const {
+            if (m_queue->m_terminated) {
+                return;
+            }
+
+            send(std::move(value));
+        }
+
         [[nodiscard]] Sender clone() const {
             return Sender{ m_queue };
+        }
+
+        void terminate() {
+            m_queue->m_terminated = true;
+        }
+
+        [[nodiscard]] bool is_terminating() const {
+            return m_queue->m_terminated;
         }
     };
 
@@ -89,6 +107,18 @@ namespace cpt {
 
         [[nodiscard]] Receiver clone() const {
             return Receiver{ m_queue };
+        }
+
+        [[nodiscard]] bool should_terminate_safe() const {
+            return should_terminate() && m_queue->m_buffer.empty();
+        }
+
+        [[nodiscard]] bool should_terminate() const {
+            return m_queue->m_terminated;
+        }
+
+        [[nodiscard]] bool has_pending_messages() const {
+            return !m_queue->m_buffer.empty();
         }
     };
 

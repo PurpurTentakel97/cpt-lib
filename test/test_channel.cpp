@@ -179,3 +179,55 @@ TEST(Channel, MultithreadedMultipleSenders) {
             << "unexpected number of received messages.\nexpected: " << messages_per_thread * thread_count
             << "\nprovided: " << received_count;
 }
+
+TEST(Channel, Termination) {
+    auto [sender, receiver] = cpt::channel<int>();
+
+    EXPECT_FALSE(sender.is_terminating());
+    EXPECT_FALSE(receiver.should_terminate());
+
+    sender.terminate();
+
+    EXPECT_TRUE(sender.is_terminating());
+    EXPECT_TRUE(receiver.should_terminate());
+}
+
+TEST(Channel, SendSafe) {
+    auto [sender, receiver] = cpt::channel<int>();
+
+    sender.send_safe(1);
+    EXPECT_TRUE(receiver.receive().has_value());
+
+    sender.terminate();
+    sender.send_safe(2);
+    EXPECT_FALSE(receiver.receive().has_value());
+}
+
+TEST(Channel, HasPendingMessages) {
+    auto [sender, receiver] = cpt::channel<int>();
+
+    EXPECT_FALSE(receiver.has_pending_messages());
+
+    sender.send(1);
+    EXPECT_TRUE(receiver.has_pending_messages());
+
+    [[maybe_unused]] auto const _ = receiver.receive();
+    EXPECT_FALSE(receiver.has_pending_messages());
+}
+
+TEST(Channel, ShouldTerminateSafe) {
+    auto [sender, receiver] = cpt::channel<int>();
+
+    EXPECT_FALSE(receiver.should_terminate_safe());
+
+    sender.terminate();
+    EXPECT_TRUE(receiver.should_terminate_safe());
+
+    auto [sender2, receiver2] = cpt::channel<int>();
+    sender2.send(1);
+    sender2.terminate();
+    EXPECT_FALSE(receiver2.should_terminate_safe()); // has pending messages
+
+    [[maybe_unused]] auto const __ = receiver2.receive();
+    EXPECT_TRUE(receiver2.should_terminate_safe()); // no more pending messages
+}
