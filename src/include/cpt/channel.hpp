@@ -85,7 +85,7 @@ namespace cpt {
             return Sender{ m_queue };
         }
 
-        void terminate() {
+        void terminate() const {
             m_queue->m_terminated = true;
         }
 
